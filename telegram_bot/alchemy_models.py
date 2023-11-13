@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -67,6 +68,6 @@ class Shift(Base):
 
 # Здесь вы можете указать свой DSN (Data Source Name) для вашей базы данных
 # Пример: 'postgresql://user:password@localhost/dbname'
-engine = create_engine('sqlite:///your_database.db')
+engine = create_engine("postgresql://worker_app:worker_app@localhost/worker_app")
 
 Base.metadata.create_all(engine)

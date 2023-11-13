@@ -75,10 +75,24 @@ WSGI_APPLICATION = 'worker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'worker_app',
+        'USER': 'worker_app',
+        'PASSWORD': 'worker_app',
+        'HOST': 'localhost',  # Use the container name or IP address if running in a container
+        'PORT': '5432',       # Use the container's port if running in a container
+        'OPTIONS': {
+            'client_encoding': 'utf8',
+        },
     }
 }
 

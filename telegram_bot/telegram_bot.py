@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 import aiogram.filters
 from django import setup
 
-from worker_app.django_models import Category
+from worker_app.models import Category
 
 #TODO: Добавить проверку пользователя по ТГ-айди в БД
 #TODO: Добавить проверку пароля

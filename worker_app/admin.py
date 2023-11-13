@@ -1,6 +1,6 @@
 from django.contrib.admin import site
 
-from worker_app.django_models import Worker, Category, CategorySub, WorkType, Object, Shift
+from worker_app.models import Worker, Category, CategorySub, WorkType, Object, Shift
 
 # Register your models here.
 site.register(Worker)

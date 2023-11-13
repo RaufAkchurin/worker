@@ -4,8 +4,8 @@
 sudo docker run -d \
 -e POSTGRES_USER=worker_app \
 -e POSTGRES_PASSWORD=worker_app \
--p 5440:5440 \
+-p 5432:5432 \
 --name worker_app \
 --restart always \
-postgres:12.7-alpine
+postgres:14.1-alpine
 ```
