@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'worker_app.apps.WorkerAppConfig',
+    'worker_app',
 ]
 
 MIDDLEWARE = [
@@ -90,9 +90,6 @@ DATABASES = {
         'PASSWORD': 'worker_app',
         'HOST': 'localhost',  # Use the container name or IP address if running in a container
         'PORT': '5432',       # Use the container's port if running in a container
-        'OPTIONS': {
-            'client_encoding': 'utf8',
-        },
     }
 }
 

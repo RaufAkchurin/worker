@@ -5,15 +5,9 @@ import sys
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
 import aiogram.filters
-from django import setup
 
-from worker_app.models import Category
-
-#TODO: Добавить проверку пользователя по ТГ-айди в БД
-#TODO: Добавить проверку пароля
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
-setup()
+# TODO: Добавить проверку пользователя по ТГ-айди в БД
+# TODO: Добавить проверку пароля
 
 BOT_LINK = "t.me/stroyka_worker_bot"
 TOKEN_API = "6769629902:AAGJf0olx2jc3hDADb-HFVYJzWgXFPLNGB8"
@@ -30,8 +24,6 @@ dp = Dispatcher()
 @dp.message(aiogram.filters.Command(commands=['help']))
 async def help_command(message: types.Message):
     await message.reply(text=HELP_COMMAND)
-    new_object = Category.objects.create(name="FROM_AIOGRAM")
-    new_object.save()
 
 
 @dp.message(aiogram.filters.Command(commands=['description']))
@@ -60,3 +52,5 @@ async def main() -> None:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
+    asyncio.get_event_loop().run_forever()
+
