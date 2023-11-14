@@ -6,7 +6,10 @@ from worker_app.models import Category, CategorySub, Object
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Object
-        fields = '__all__'
+        fields = (
+            "id",
+            "name",
+        )
 
 
 class CategorySerializer(serializers.ModelSerializer):

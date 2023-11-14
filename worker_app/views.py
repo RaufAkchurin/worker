@@ -17,3 +17,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class CategorySubViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySubSerializer
     queryset = CategorySub.objects.all()
+
+
+# для смены - если вводится тип-работ и дата  на которые уже есть запись -
+# спросить хочет ли он перезаписать и просто изменять данные
