@@ -66,10 +66,9 @@ def paginator(page: int=0):
     return builder.as_markup()
 
 
-def calc_kb():
+def objects_kb():
     data = get_object_list()
     items = [item["name"] for item in data]
-
     builder = ReplyKeyboardBuilder()
     [builder.button(text=item) for item in items]
     builder.button(text="НАЗАД")

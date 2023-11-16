@@ -1,23 +1,39 @@
 from rest_framework import viewsets
-from rest_framework import generics
-from .models import WorkType
-from .serializers import WorkTypeSerializer
 
 from worker_app.models import Category, Object
 from worker_app.serializers import ObjectSerializer
 
 
-class ObjectViewSet(viewsets.ModelViewSet):
+class ObjectListViewSet(viewsets.ModelViewSet):
     serializer_class = ObjectSerializer
-    queryset = Category.objects.all()
+    queryset = Object.objects.all()
 
 
-class WorkTypeListByObjectView(generics.ListAPIView):
-    serializer_class = WorkTypeSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Object, WorkType
 
-    def get_queryset(self):
-        object_id = self.kwargs['pk']
-        return WorkType.objects.filter(object__id=object_id)
+
+class CategoryListView(APIView):
+    def get(self, request, object_id):
+        try:
+            # Получаем объект по айди
+            object_instance = Object.objects.get(id=object_id)
+
+            # Получаем все виды работ для данного объекта
+            work_types = WorkType.objects.filter(object=object_instance)
+
+            # Получаем уникальные категории с айди и названием
+            unique_categories = work_types.values('category__id', 'category__name').distinct()
+
+            # Преобразуем каждую категорию в словарь
+            categories_list = [{'id': category['category__id'], 'name': category['category__name']} for category in unique_categories]
+
+            return Response({'categories': categories_list})
+
+        except Object.DoesNotExist:
+            return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
