@@ -56,7 +56,7 @@ class Pagination(CallbackData, prefix="pag"):
     page: int
 
 
-def paginator(page: int=0):
+def paginator(page: int = 0):
     builder = InlineKeyboardBuilder()
     builder.row(
         InlineKeyboardButton(text="⬅", callback_data=Pagination(action="prev", page=page).pack()),

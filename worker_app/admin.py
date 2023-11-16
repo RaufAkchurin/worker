@@ -12,8 +12,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
 # Register your models here.
 class WorkTypeAdmin(admin.ModelAdmin):
-    fields = ("category",)
     raw_id_fields = ("category",)
+
 
 
 site.register(Worker)
