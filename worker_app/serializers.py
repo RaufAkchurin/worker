@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from worker_app.models import Category, CategorySub, Object
+from worker_app.models import Category, Object, WorkType
 
 
 class ObjectSerializer(serializers.ModelSerializer):
@@ -12,13 +12,7 @@ class ObjectSerializer(serializers.ModelSerializer):
         )
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class WorkTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Category
-        fields = '__all__'
-
-
-class CategorySubSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CategorySub
+        model = WorkType
         fields = '__all__'

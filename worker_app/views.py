@@ -1,22 +1,24 @@
-from rest_framework import status, viewsets
+from rest_framework import viewsets
+from rest_framework import generics
+from .models import WorkType
+from .serializers import WorkTypeSerializer
 
-from worker_app.models import Category, CategorySub, Object
-from worker_app.serializers import CategorySerializer, CategorySubSerializer, ObjectSerializer
+from worker_app.models import Category, Object
+from worker_app.serializers import ObjectSerializer
 
 
 class ObjectViewSet(viewsets.ModelViewSet):
     serializer_class = ObjectSerializer
-    queryset = Object.objects.all()
-
-
-class CategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
 
-class CategorySubViewSet(viewsets.ModelViewSet):
-    serializer_class = CategorySubSerializer
-    queryset = CategorySub.objects.all()
+class WorkTypeListByObjectView(generics.ListAPIView):
+    serializer_class = WorkTypeSerializer
+
+    def get_queryset(self):
+        object_id = self.kwargs['pk']
+        return WorkType.objects.filter(object__id=object_id)
+
 
 
 # для смены - если вводится тип-работ и дата  на которые уже есть запись -

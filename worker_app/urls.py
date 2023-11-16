@@ -1,6 +1,6 @@
 from django.urls import path
 
-from worker_app.views import CategoryViewSet, CategorySubViewSet, ObjectViewSet
+from worker_app.views import  ObjectViewSet, WorkTypeListByObjectView
 
 urlpatterns = [
 
@@ -17,32 +17,7 @@ urlpatterns = [
     ),
     # path('omac/type/<int:pk>/', TypeView.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'})),
 
-
-    # CATEGORY
-    # path('category', CategoryViewSet.as_view(), name='category'),
-    path(
-        "category",
-        CategoryViewSet.as_view({
-                                'get': 'list',
-                                 # 'post': 'create',
-                                 # 'put': 'update'
-                                 }),
-        name="category",
-    ),
-    # path('omac/type/<int:pk>/', TypeView.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'})),
-
-    #CATEGORY SUB
-    # path('category', CategoryViewSet.as_view(), name='category'),
-    path(
-        "category_sub",
-        CategorySubViewSet.as_view({
-            'get': 'list',
-            # 'post': 'create',
-            # 'put': 'update'
-        }),
-        name="category_sub",
-    ),
-    # path('omac/type/<int:pk>/', TypeView.as_view({'put': 'update', 'delete': 'destroy', 'get': 'retrieve'})),
+    path('work_types/<int:pk>/', WorkTypeListByObjectView.as_view(), name='worktype-list-by-object')
 
 
 ]
