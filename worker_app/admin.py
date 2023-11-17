@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.admin import site
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement
-
+#вдминке в типы работ добавить фильтр по категориям
+#вдминке в типы работ добавить фильтр по объектам
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "object",)
