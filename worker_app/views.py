@@ -1,7 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 
 from worker_app.models import Category
-from worker_app.serializers import ObjectSerializer
+from worker_app.serializers import ObjectSerializer, WorkTypeSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Object
@@ -53,14 +53,23 @@ class WorkTypesByObjectView(View):
         # Serialize the data for JsonResponse
         work_types_data = [
             {
+                'id': work_type.pk,
                 'name': work_type.name,
-                'price_for_worker': work_type.price_for_worker,
-                'price_for_customer': work_type.price_for_customer,
-                'total_scope': work_type.total_scope,
-                'measurement_type': work_type.measurement_type.name,
+                # 'price_for_worker': work_type.price_for_worker,
+                # 'price_for_customer': work_type.price_for_customer,
+                # 'total_scope': work_type.total_scope,
+                # 'measurement_type': work_type.measurement_type.name,
             }
             for work_type in work_types
         ]
 
         # Return the data as JSON response
         return JsonResponse({'work_types': work_types_data})
+
+
+class WorkTypeListByCategory(generics.ListAPIView):
+    serializer_class = WorkTypeSerializer
+
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return WorkType.objects.filter(category__id=category_id)

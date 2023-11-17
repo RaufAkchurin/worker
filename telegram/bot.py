@@ -10,11 +10,10 @@ from aiogram.filters import CommandStart
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 import keyboards
-from telegram.API import get_object_list
-from telegram.objects_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard
+from telegram.objects_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, \
+    TypeCallbackFactory, TypeInlineKeyboard
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
@@ -62,13 +61,6 @@ async def pagination_handler(call: CallbackQuery, callback_data: keyboards.Pagin
     await call.answer()
 
 
-#
-#
-@dp.message(F.text.lower().in_(["хай", "хелоу", "привет"]))
-async def greetings(message: Message):
-    await message.reply("Привееееть!")
-
-
 @dp.message()
 async def echo(message: Message):
     msg = message.text.lower()
@@ -79,8 +71,6 @@ async def echo(message: Message):
         await message.answer("Спец. кнопки:", reply_markup=keyboards.spec_kb)
     elif msg == "отпр. отчёт":
         await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
-    elif msg == "смайлики":
-        await message.answer(f"{smiles[0][0]} <b>{smiles[0][1]}</b>", reply_markup=keyboards.paginator())
     elif msg == "назад":
         await message.answer("Вы перешли в главное меню!", reply_markup=keyboards.main_kb)
 
@@ -89,93 +79,6 @@ async def echo(message: Message):
 
 async def on_startup():
     print("Я был запущен")
-
-
-# @dp.message(aiogram.filters.CommandStart())
-# async def help_command(message: types.Message):
-#     await message.answer(text="Добро пожаловать в наш телеграмм Бот")
-#     await message.delete()
-#
-#
-# @dp.message(aiogram.filters.Command(commands=['help']))
-# async def help_command(message: types.Message):
-#     await message.reply(text=HELP_COMMAND)
-#
-#
-# @dp.message(aiogram.filters.Command(commands=['description']))
-# async def description_command(message: types.Message):
-#     await message.reply(text="Данный бот собирает отчёты о вашей рабочей смене")
-#
-#
-# @dp.message()
-# async def echo_capitalize(message: types.Message):
-#     await message.answer(text=message.text.capitalize())
-
-# Создаем объекты инлайн-кнопок
-big_button_1 = InlineKeyboardButton(
-    text='БОЛЬШАЯ КНОПКА 1',
-    callback_data='big_button_1_pressed'
-)
-
-big_button_2 = InlineKeyboardButton(
-    text='БОЛЬШАЯ КНОПКА 2',
-    callback_data='big_button_2_pressed'
-)
-
-
-# Создаем свой класс фабрики коллбэков, указывая префикс
-# и структуру callback_data
-class GoodsCallbackFactory(CallbackData, prefix="goods"):
-    object_id: int
-    category_id: int
-    work_type_id: int
-
-
-# Создаем объекты кнопок, с применением фабрики коллбэков
-button_1 = InlineKeyboardButton(
-    text='Категория 1',  # name от категории тут должен быть
-    callback_data=GoodsCallbackFactory(
-        object_id=1,  # id от категории
-        category_id=0,
-        work_type_id=0
-    ).pack()
-)
-
-button_2 = InlineKeyboardButton(
-    text='Категория 2',
-    callback_data=GoodsCallbackFactory(
-        object_id=2,
-        category_id=0,
-        work_type_id=0
-    ).pack()
-)
-
-# Создаем объект клавиатуры, добавляя в список списки с кнопками
-markup = InlineKeyboardMarkup(
-    inline_keyboard=[[button_1], [button_2]]
-)
-
-
-# Этот хэндлер будет срабатывать на команду /start
-# и отправлять пользователю сообщение с клавиатурой
-@dp.message(CommandStart())
-async def process_start_command(message: Message):
-    await message.answer(
-        text='Вот такая клавиатура',
-        reply_markup=markup
-    )
-
-
-######################################################################################################################
-@dp.callback_query(GoodsCallbackFactory.filter())
-async def process_category_press(callback: CallbackQuery,
-                                 callback_data: GoodsCallbackFactory):
-    await callback.message.answer(
-        text=f'Объект: {callback_data.object_id}\n' \
-             f'Категория: {callback_data.category_id}\n' \
-             f'Тип работ: {callback_data.work_type_id}'
-    )
-    await callback.answer()
 
 
 ######################################################################################################################
@@ -187,10 +90,21 @@ async def process_object_press(callback: CallbackQuery,
              f'Название объекта: {callback_data.name}\n',
         reply_markup=CategoryInlineKeyboard(callback_data.id)
     )
-    await callback.answer()
 
 
 #################################################################3###################################################
+
+@dp.callback_query(TypeCallbackFactory.filter())
+async def process_category_press(callback: CallbackQuery,
+                                 callback_data: TypeCallbackFactory):
+    await callback.message.answer(
+        text=f'Айди категории: {callback_data.id}\n' \
+             f'Название категории: {callback_data.name}\n',
+        reply_markup=TypeInlineKeyboard(callback_data.id)
+    )
+
+#################################################################3###################################################
+
 
 async def main() -> None:
     dp.startup.register(on_startup)

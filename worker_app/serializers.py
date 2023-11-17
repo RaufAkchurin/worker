@@ -15,4 +15,7 @@ class ObjectSerializer(serializers.ModelSerializer):
 class WorkTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkType
-        fields = '__all__'
+        fields = (
+            "id",
+            "name",
+        )
