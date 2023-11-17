@@ -166,23 +166,7 @@ async def process_start_command(message: Message):
     )
 
 
-# # Этот хэндлер будет срабатывать на нажатие любой
-# # инлайн кнопки и распечатывать апдейт в терминал
-# @dp.callback_query()
-# async def process_any_inline_button_press(callback: CallbackQuery):
-#     print(callback.model_dump_json(indent=4, exclude_none=True))
-#     await callback.answer()
-#
-# # Этот хэндлер будет срабатывать на нажатие любой
-# # инлайн кнопки и распечатывать апдейт в терминал
-# @dp.callback_query(GoodsCallbackFactory.filter(F.category_id==1))
-# async def process_category_press(callback: CallbackQuery,
-#                                  callback_data: GoodsCallbackFactory):
-#     await callback.message.answer(text=callback_data.pack())
-#     await callback.answer()
-
-# Этот хэндлер будет срабатывать на нажатие любой инлайн кнопки
-# и отправлять в чат форматированный ответ с данными из callback_data
+######################################################################################################################
 @dp.callback_query(GoodsCallbackFactory.filter())
 async def process_category_press(callback: CallbackQuery,
                                  callback_data: GoodsCallbackFactory):

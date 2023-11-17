@@ -25,6 +25,8 @@ def ObjectInlineKeyboard():
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
 
+######################################################################################
+
 
 class CategoryCallbackFactory(CallbackData, prefix="category"):
     id: str
@@ -47,3 +49,7 @@ def CategoryInlineKeyboard(object_id):
             )])
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
+
+######################################################################################
+
+

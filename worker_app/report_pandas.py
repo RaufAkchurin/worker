@@ -4,13 +4,23 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Alignment, PatternFill
 from django.db.models import F, Sum
-from .models import Shift, WorkType
+from rest_framework import status
+from rest_framework.response import Response
+
+from .models import Shift, WorkType, Object
 
 
 class GenerateReportView(View):
     def get(self, request, *args, **kwargs):
         # Извлекаем данные из базы
-        work_types = WorkType.objects.annotate(
+        object_id = kwargs.get("object_id", None)
+        object = Object.objects.filter(id=object_id).first()
+        work_types = WorkType.objects.filter(category__object=object)
+
+        if not work_types.count():
+            return HttpResponse({'WorkType for this object not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        work_types = work_types.annotate(
             сумма=F('total_scope') * F('price_for_worker'),
         ).values(
             'name',

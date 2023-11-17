@@ -36,5 +36,31 @@ class CategoryListView(APIView):
 
 # для смены - если вводится тип-работ и дата  на которые уже есть запись -
 # спросить хочет ли он перезаписать и просто изменять данные
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views import View
+from .models import Object, WorkType
 
 
+class WorkTypesByObjectView(View):
+    def get(self, request, object_id):
+        # Get the object or return a 404 error if not found
+        obj = get_object_or_404(Object, id=object_id)
+
+        # Get all work types related to the specified object
+        work_types = WorkType.objects.filter(category__object=obj)
+
+        # Serialize the data for JsonResponse
+        work_types_data = [
+            {
+                'name': work_type.name,
+                'price_for_worker': work_type.price_for_worker,
+                'price_for_customer': work_type.price_for_customer,
+                'total_scope': work_type.total_scope,
+                'measurement_type': work_type.measurement_type.name,
+            }
+            for work_type in work_types
+        ]
+
+        # Return the data as JSON response
+        return JsonResponse({'work_types': work_types_data})
