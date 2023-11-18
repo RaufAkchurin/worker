@@ -82,10 +82,14 @@ class GenerateReportView(View):
             object_name_row = pd.DataFrame({'Наименование объекта': [object.name] + [''] * 5})
             writer.sheets['WorkTypes'].append(list(object_name_row.iloc[0]), )
 
+            # Устанавливаем высоту строки
+            start_row = writer.sheets['WorkTypes'].max_row
+            writer.sheets['WorkTypes'].row_dimensions[
+                start_row].height = 30  # Например, устанавливаем высоту в 30 пунктов
+
             # Объединяем первые шесть ячеек в первой строке
             start_col = 1
             end_col = 8
-            start_row = writer.sheets['WorkTypes'].max_row
             end_row = start_row
             writer.sheets['WorkTypes'].merge_cells(start_row=start_row, start_column=start_col, end_row=end_row,
                                                    end_column=end_col)
@@ -96,6 +100,7 @@ class GenerateReportView(View):
 
             # Продолжаем существующий цикл для записи данных категорий
             for category, category_df in grouped_df.groupby('Категория'):
+
                 # Записываем название категории в каждую строку
                 category_row = pd.DataFrame({'Наименование работ': [f'Категория: {category}'], 'Категория': ['']})
                 writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
