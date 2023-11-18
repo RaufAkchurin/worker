@@ -1,77 +1,79 @@
-from aiogram.types import (
-    ReplyKeyboardMarkup,
-    KeyboardButton,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    KeyboardButtonPollType
-)
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from telegram.API import get_object_list
-
-main_kb = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton(text="Смайлики"),
-            KeyboardButton(text="Ссылки")
-        ],
-        [
-            KeyboardButton(text="Отпр. отчёт"),
-            KeyboardButton(text="Спец. кнопки")
-        ]
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=False,
-    input_field_placeholder="Выберите действие из меню",
-    selective=True
-)
-
-links_kb = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="YouTube", url="https://youtu.be/@fsoky"),
-            InlineKeyboardButton(text="Telegram", url="tg://resolve?domain=fsoky_community")
-        ]
-    ]
-)
-
-spec_kb = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton(text="Отправить гео", request_location=True),
-            KeyboardButton(text="Отправить контакт", request_contact=True),
-            KeyboardButton(text="Создать викторину", request_poll=KeyboardButtonPollType())
-        ],
-        [
-            KeyboardButton(text="НАЗАД")
-        ]
-    ],
-    resize_keyboard=True
-)
+from telegram.API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
+    get_work_type_list_by_category_id
 
 
-class Pagination(CallbackData, prefix="pag"):
-    action: str
-    page: int
+class ObjectCallbackFactory(CallbackData, prefix="object"):
+    id: str
+    name: str
 
 
-def paginator(page: int = 0):
-    builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(text="⬅", callback_data=Pagination(action="prev", page=page).pack()),
-        InlineKeyboardButton(text="➡", callback_data=Pagination(action="next", page=page).pack()),
-        width=2
-    )
-    return builder.as_markup()
+def ObjectInlineKeyboard():
+    objects = get_object_list()
+    inline_keyboard = []
+
+    for object in objects:
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text=object["name"],
+                callback_data=ObjectCallbackFactory(
+                    id=str(object["id"]),
+                    name=object["name"]
+                ).pack()
+            )])
+    object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return object_inline_markup
+
+######################################################################################
 
 
-def objects_kb():
-    data = get_object_list()
-    items = [item["name"] for item in data]
-    builder = ReplyKeyboardBuilder()
-    [builder.button(text=item) for item in items]
-    builder.button(text="НАЗАД")
-    builder.adjust(*[1] * 4)
+class CategoryCallbackFactory(CallbackData, prefix="category"):
+    id: str
+    name: str
 
-    return builder.as_markup(resize_keyboard=True)
+
+def CategoryInlineKeyboard(object_id):
+
+    categories = get_category_list_by_object_id(object_id)
+    inline_keyboard = []
+
+    for category in categories:
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text=category["name"],
+                callback_data=CategoryCallbackFactory(
+                    id=str(category["id"]),
+                    name=category["name"],
+                    action="change_category"
+                ).pack()
+            )])
+    category_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return category_inline_markup
+
+######################################################################################
+
+
+class TypeCallbackFactory(CallbackData, prefix="type"):
+    id: str
+    name: str
+
+
+def TypeInlineKeyboard(category_id):
+
+    items = get_work_type_list_by_category_id(category_id)
+    inline_keyboard = []
+
+    for item in items:
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text=item["name"],
+                callback_data=TypeCallbackFactory(
+                    id=str(item["id"]),
+                    name=item["name"]
+                ).pack()
+            )])
+    type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
+    return type_inline_markup
+

@@ -4,6 +4,7 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Alignment, PatternFill
 from django.db.models import F, Sum
+from openpyxl.utils import get_column_letter
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -74,39 +75,45 @@ class GenerateReportView(View):
         # Создаем Excel-файл
         excel_file_path = 'report.xlsx'
         with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-            # Create an empty 'WorkTypes' sheet
+            # Создаем пустой лист 'WorkTypes'
             writer.book.create_sheet('WorkTypes')
 
+            # Записываем название объекта в первую строку и объединяем первые шесть ячеек
+            object_name_row = pd.DataFrame({'Наименование объекта': [object.name] + [''] * 5})
+            writer.sheets['WorkTypes'].append(list(object_name_row.iloc[0]), )
+
+            # Объединяем первые шесть ячеек в первой строке
+            start_col = 1
+            end_col = 8
+            start_row = writer.sheets['WorkTypes'].max_row
+            end_row = start_row
+            writer.sheets['WorkTypes'].merge_cells(start_row=start_row, start_column=start_col, end_row=end_row,
+                                                   end_column=end_col)
+
+            # Устанавливаем выравнивание для объединенных ячеек
+            merged_cells = writer.sheets['WorkTypes'].cell(row=start_row, column=start_col)
+            merged_cells.alignment = Alignment(horizontal='center', vertical='center')
+
+            # Продолжаем существующий цикл для записи данных категорий
             for category, category_df in grouped_df.groupby('Категория'):
-                # Write category name row for each category
+                # Записываем название категории в каждую строку
                 category_row = pd.DataFrame({'Наименование работ': [f'Категория: {category}'], 'Категория': ['']})
                 writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
 
-                # Merge cells, make text bold, center alignment, and yellow background for the category name
+                # Объединяем ячейки, делаем текст жирным, центрируем, устанавливаем желтый фон для названия категории
                 for cell in list(writer.sheets['WorkTypes'].rows)[-1]:
                     cell.alignment = Alignment(horizontal='center', vertical='center')
                     cell.font = NamedStyle(name='Bold').font.__class__(bold=True)
                     cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
 
-                # Write data for each category
+                # Записываем данные для каждой категории
                 category_df.to_excel(writer, sheet_name='WorkTypes', index=False,
                                      startrow=writer.sheets['WorkTypes'].max_row)
 
-            # Устанавливаем ширину столбцов для каждого листа
-            for sheet_name in writer.sheets.keys():
-                for column in writer.sheets[sheet_name].columns:
-                    max_length = 0
-                    column = [column[0]] + [str(i) for i in column[1:]]
-                    for cell in column:
-                        try:
-                            if len(str(cell)) > max_length:
-                                max_length = len(cell)
-                        except:
-                            pass
-                    adjusted_width = (max_length + 2)
-
-                    # Применяем ширину столбца к листу Excel
-                    writer.sheets[sheet_name].column_dimensions[column[0].column_letter].width = adjusted_width
+            # Устанавливаем ширину для объединенных ячеек
+            for col in range(start_col, end_col + 1):
+                col_letter = get_column_letter(col)
+                writer.sheets['WorkTypes'].column_dimensions[col_letter].width = 15
 
         # Отправляем файл пользователю
         with open(excel_file_path, 'rb') as excel:

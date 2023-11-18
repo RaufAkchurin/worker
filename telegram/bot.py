@@ -11,9 +11,9 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.exceptions import TelegramBadRequest
 
-import keyboards
-from telegram.objects_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, \
-    TypeCallbackFactory, TypeInlineKeyboard
+import test_kb
+from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, \
+    TypeCallbackFactory, TypeInlineKeyboard, CategoryCallbackFactory
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
@@ -42,11 +42,13 @@ smiles = [
 
 @dp.message(CommandStart())
 async def start(message: Message):
-    await message.answer("Hello, AIOgram 3.x", reply_markup=keyboards.main_kb)
+    user_id = message.from_user.username
+    await message.answer(f"Hello, AIOgram 3.x! Your user ID is {user_id}", reply_markup=test_kb.main_kb)
 
 
-@dp.callback_query(keyboards.Pagination.filter(F.action.in_(["prev", "next"])))
-async def pagination_handler(call: CallbackQuery, callback_data: keyboards.Pagination):
+
+@dp.callback_query(test_kb.Pagination.filter(F.action.in_(["prev", "next"])))
+async def pagination_handler(call: CallbackQuery, callback_data: test_kb.Pagination):
     page_num = int(callback_data.page)
     page = page_num - 1 if page_num > 0 else 0
 
@@ -56,7 +58,7 @@ async def pagination_handler(call: CallbackQuery, callback_data: keyboards.Pagin
     with suppress(TelegramBadRequest):
         await call.message.edit_text(
             f"{smiles[page][0]} <b>{smiles[page][1]}</b>",
-            reply_markup=keyboards.paginator(page)
+            reply_markup=test_kb.paginator(page)
         )
     await call.answer()
 
@@ -66,13 +68,13 @@ async def echo(message: Message):
     msg = message.text.lower()
 
     if msg == "ссылки":
-        await message.answer("Вот ваши ссылки:", reply_markup=keyboards.links_kb)
+        await message.answer("Вот ваши ссылки:", reply_markup=test_kb.links_kb)
     elif msg == "спец. кнопки":
-        await message.answer("Спец. кнопки:", reply_markup=keyboards.spec_kb)
+        await message.answer("Спец. кнопки:", reply_markup=test_kb.spec_kb)
     elif msg == "отпр. отчёт":
         await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
     elif msg == "назад":
-        await message.answer("Вы перешли в главное меню!", reply_markup=keyboards.main_kb)
+        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
 
     #############################################################################################
 
@@ -94,9 +96,9 @@ async def process_object_press(callback: CallbackQuery,
 
 #################################################################3###################################################
 
-@dp.callback_query(TypeCallbackFactory.filter())
+@dp.callback_query(CategoryCallbackFactory.filter())
 async def process_category_press(callback: CallbackQuery,
-                                 callback_data: TypeCallbackFactory):
+                                 callback_data: CategoryCallbackFactory):
     await callback.message.answer(
         text=f'Айди категории: {callback_data.id}\n' \
              f'Название категории: {callback_data.name}\n',
