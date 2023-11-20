@@ -128,16 +128,20 @@ class GenerateReportView(View):
                 category_df.to_excel(writer, sheet_name='WorkTypes', index=False,
                                      startrow=writer.sheets['WorkTypes'].max_row)
 
+                # Добавляем пустую строку
+                category_row = pd.DataFrame({'Наименование работ': [f'итого: {category}'],})
+                writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
+
             # Устанавливаем ширину для объединенных ячеек
             for col in range(start_col, end_col + 1):
                 col_letter = get_column_letter(col)
                 writer.sheets['WorkTypes'].column_dimensions[col_letter].width = 15
 
-            # Скрытие первой колонки
-            writer.sheets['WorkTypes'].column_dimensions['A'].hidden = True
+            # # Скрытие первой колонки
+            # writer.sheets['WorkTypes'].column_dimensions['A'].hidden = True
 
             # Установка ширин для второй, третьей и четвертой колонок
-            column_widths = {'B': 57, 'C': 10, 'D': 10, 'E': 10, 'F': 10, 'G': 20, 'H': 20}
+            column_widths = {'A': 50, 'B': 57, 'C': 10, 'D': 10, 'E': 10, 'F': 10, 'G': 20, 'H': 20}
 
             for col_letter, width in column_widths.items():
                 writer.sheets['WorkTypes'].column_dimensions[col_letter].width = width
