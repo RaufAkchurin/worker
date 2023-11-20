@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.views import View
 import pandas as pd
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Alignment, PatternFill
+from openpyxl.styles import NamedStyle, Alignment, PatternFill, Font
 from django.db.models import F, Sum
 from openpyxl.utils import get_column_letter
 from rest_framework import status
@@ -78,7 +78,7 @@ class GenerateReportView(View):
             # Создаем пустой лист 'WorkTypes'
             writer.book.create_sheet('WorkTypes')
 #####################################################################################################################
-                                            # Object  info
+            # Object  info
 
             # Записываем название объекта в первую строку и объединяем первые шесть ячеек
             object_name_row = pd.DataFrame({'Наименование объекта': [object.name] + [''] * 5})
@@ -127,6 +127,8 @@ class GenerateReportView(View):
                 # Записываем данные для каждой категории
                 category_df.to_excel(writer, sheet_name='WorkTypes', index=False,
                                      startrow=writer.sheets['WorkTypes'].max_row)
+###################################################################################################################
+                # итоговые данные после списка типов работ
 
                 # Добавляем пустую строку
                 category_row = pd.DataFrame({'Наименование работ': [f'итого: {category}'], })
@@ -135,16 +137,28 @@ class GenerateReportView(View):
                 # Рассчитываем и добавляем итог для каждой категории в колонку "summa_zakazchika"
                 sum_customer_value = category_df['сумма_заказчика'].sum()
                 sum_customer_row = pd.DataFrame({'сумма_заказчика': [sum_customer_value]})
-                column_letter = get_column_letter(writer.sheets['WorkTypes'].max_column)
+                column_letter_1 = get_column_letter(writer.sheets['WorkTypes'].max_column)
                 writer.sheets['WorkTypes'][
-                    f'{column_letter}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_customer_value
+                    f'{column_letter_1}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_customer_value
 
                 # Рассчитываем и добавляем итог для каждой категории в колонку "summa"
                 sum_value = category_df['сумма'].sum()
                 sum_row = pd.DataFrame({'сумма': [sum_value]})
-                column_letter = get_column_letter(writer.sheets['WorkTypes'].max_column - 2)
+                column_letter_2 = get_column_letter(writer.sheets['WorkTypes'].max_column - 2)
                 writer.sheets['WorkTypes'][
-                    f'{column_letter}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_value
+                    f'{column_letter_2}{writer.sheets["WorkTypes"].max_row}'] = sum_value
+
+                # Определите адрес ячейки, которую вы хотите выделить жирным шрифтом
+                cell_address_sum_customer = f'{column_letter_1}{writer.sheets["WorkTypes"].max_row}'
+                cell_address_sum = f'{column_letter_2}{writer.sheets["WorkTypes"].max_row}'
+
+                # Установите стиль для жирного шрифта
+                bold_font = Font(bold=True)
+
+                # Примените стиль к выбранным ячейкам
+                writer.sheets['WorkTypes'][cell_address_sum_customer].font = bold_font
+                writer.sheets['WorkTypes'][cell_address_sum].font = bold_font
+###################################################################################################################
 
             # Устанавливаем ширину для объединенных ячеек
             for col in range(start_col, end_col + 1):
