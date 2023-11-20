@@ -22,7 +22,7 @@ class GenerateReportView(View):
             return HttpResponse({'WorkType for this object not found'}, status=status.HTTP_404_NOT_FOUND)
 
         work_types = work_types.annotate(
-            сумма=F('total_scope') * F('price_for_worker'),
+            сумма=F('total_scope') * F('price_for_customer'),
         ).values(
             'name',
             'category__name',  # Include the category name for grouping
@@ -129,8 +129,22 @@ class GenerateReportView(View):
                                      startrow=writer.sheets['WorkTypes'].max_row)
 
                 # Добавляем пустую строку
-                category_row = pd.DataFrame({'Наименование работ': [f'итого: {category}'],})
+                category_row = pd.DataFrame({'Наименование работ': [f'итого: {category}'], })
                 writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
+
+                # Рассчитываем и добавляем итог для каждой категории в колонку "summa_zakazchika"
+                sum_customer_value = category_df['сумма_заказчика'].sum()
+                sum_customer_row = pd.DataFrame({'сумма_заказчика': [sum_customer_value]})
+                column_letter = get_column_letter(writer.sheets['WorkTypes'].max_column)
+                writer.sheets['WorkTypes'][
+                    f'{column_letter}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_customer_value
+
+                # Рассчитываем и добавляем итог для каждой категории в колонку "summa"
+                sum_value = category_df['сумма'].sum()
+                sum_row = pd.DataFrame({'сумма': [sum_value]})
+                column_letter = get_column_letter(writer.sheets['WorkTypes'].max_column - 2)
+                writer.sheets['WorkTypes'][
+                    f'{column_letter}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_value
 
             # Устанавливаем ширину для объединенных ячеек
             for col in range(start_col, end_col + 1):
