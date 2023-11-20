@@ -22,6 +22,8 @@ class WorkTypeAdmin(admin.ModelAdmin):
 
 class ShiftAdmin(admin.ModelAdmin):
     raw_id_fields = ("work_type",)
+    list_filter = ("work_type",)
+    search_fields = ("name",)
 
 
 site.register(Worker)

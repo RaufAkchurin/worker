@@ -65,7 +65,7 @@ class GenerateReportView(View):
         # Группируем данные по категории и типу работ, агрегируем значения
         grouped_df = merged_df.groupby(['Категория', 'Наименование работ']).agg({
             'ед.изм.': 'first',
-            'кол-во': 'sum',
+            'кол-во': 'first',
             'цена': 'first',
             'сумма': 'sum',
             'кол-во выполненное': 'sum',
@@ -165,8 +165,8 @@ class GenerateReportView(View):
                 col_letter = get_column_letter(col)
                 writer.sheets['WorkTypes'].column_dimensions[col_letter].width = 15
 
-            # # Скрытие первой колонки
-            # writer.sheets['WorkTypes'].column_dimensions['A'].hidden = True
+            # Скрытие первой колонки
+            writer.sheets['WorkTypes'].column_dimensions['A'].hidden = True
 
             # Установка ширин для второй, третьей и четвертой колонок
             column_widths = {'A': 50, 'B': 57, 'C': 10, 'D': 10, 'E': 10, 'F': 10, 'G': 20, 'H': 20}
