@@ -77,6 +77,8 @@ class GenerateReportView(View):
         with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
             # Создаем пустой лист 'WorkTypes'
             writer.book.create_sheet('WorkTypes')
+#####################################################################################################################
+                                            # Object  info
 
             # Записываем название объекта в первую строку и объединяем первые шесть ячеек
             object_name_row = pd.DataFrame({'Наименование объекта': [object.name] + [''] * 5})
@@ -85,7 +87,7 @@ class GenerateReportView(View):
             # Устанавливаем высоту строки
             start_row = writer.sheets['WorkTypes'].max_row
             writer.sheets['WorkTypes'].row_dimensions[
-                start_row].height = 30  # Например, устанавливаем высоту в 30 пунктов
+                start_row].height = 25  # устанавливаем высоту в 30 пунктов
 
             # Объединяем первые шесть ячеек в первой строке
             start_col = 1
@@ -98,6 +100,13 @@ class GenerateReportView(View):
             merged_cells = writer.sheets['WorkTypes'].cell(row=start_row, column=start_col)
             merged_cells.alignment = Alignment(horizontal='center', vertical='center')
 
+            # Устанавливаем цвет для ячейки с названием объекта
+            object_name_cell = writer.sheets['WorkTypes'].cell(row=start_row, column=start_col)
+            object_name_cell.fill = PatternFill(start_color='808080', end_color='808080',
+                                                fill_type='solid')  # Серый цвет
+
+#####################################################################################################################
+
             # Продолжаем существующий цикл для записи данных категорий
             for category, category_df in grouped_df.groupby('Категория'):
 
@@ -105,11 +114,15 @@ class GenerateReportView(View):
                 category_row = pd.DataFrame({'Наименование работ': [f'Категория: {category}'], 'Категория': ['']})
                 writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
 
+                # Смержим ячейки и установим текст по центру
+                merged_cell_range = f'A{writer.sheets["WorkTypes"].max_row}:H{writer.sheets["WorkTypes"].max_row}'
+                writer.sheets['WorkTypes'].merge_cells(merged_cell_range)
+
                 # Объединяем ячейки, делаем текст жирным, центрируем, устанавливаем желтый фон для названия категории
                 for cell in list(writer.sheets['WorkTypes'].rows)[-1]:
                     cell.alignment = Alignment(horizontal='center', vertical='center')
                     cell.font = NamedStyle(name='Bold').font.__class__(bold=True)
-                    cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+                    cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Желтый цвет
 
                 # Записываем данные для каждой категории
                 category_df.to_excel(writer, sheet_name='WorkTypes', index=False,
@@ -119,6 +132,15 @@ class GenerateReportView(View):
             for col in range(start_col, end_col + 1):
                 col_letter = get_column_letter(col)
                 writer.sheets['WorkTypes'].column_dimensions[col_letter].width = 15
+
+            # Скрытие первой колонки
+            writer.sheets['WorkTypes'].column_dimensions['A'].hidden = True
+
+            # Установка ширин для второй, третьей и четвертой колонок
+            column_widths = {'B': 57, 'C': 10, 'D': 10, 'E': 10, 'F': 10, 'G': 20, 'H': 20}
+
+            for col_letter, width in column_widths.items():
+                writer.sheets['WorkTypes'].column_dimensions[col_letter].width = width
 
         # Отправляем файл пользователю
         with open(excel_file_path, 'rb') as excel:

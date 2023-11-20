@@ -46,7 +46,7 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return f"{self.object} - {self.name}"
 
 
 class WorkType(models.Model):
