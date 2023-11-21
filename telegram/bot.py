@@ -10,8 +10,8 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKe
 from aiogram.exceptions import TelegramBadRequest
 
 import test_kb
-from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, \
-    TypeCallbackFactory, TypeInlineKeyboard, CategoryCallbackFactory
+from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, CategoryCallbackFactory
+from telegram.log.workers_kb import WorkerInlineKeyboard
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
@@ -64,10 +64,8 @@ async def pagination_handler(call: CallbackQuery, callback_data: test_kb.Paginat
 async def echo(message: Message):
     msg = message.text.lower()
 
-    if msg == "ссылки":
-        await message.answer("Вот ваши ссылки:", reply_markup=test_kb.links_kb)
-    elif msg == "спец. кнопки":
-        await message.answer("Спец. кнопки:", reply_markup=test_kb.spec_kb)
+    if msg == "авторизоваться":
+        await message.answer("Выберите своё имя:", reply_markup=WorkerInlineKeyboard())
     elif msg == "отпр. отчёт":
         await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
     elif msg == "назад":

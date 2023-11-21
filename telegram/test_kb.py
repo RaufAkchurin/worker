@@ -13,12 +13,12 @@ from telegram.API import get_object_list
 main_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Смайлики"),
-            KeyboardButton(text="Ссылки")
+            KeyboardButton(text="Авторизоваться"),
+            # KeyboardButton(text="Ссылки")
         ],
         [
             KeyboardButton(text="Отпр. отчёт"),
-            KeyboardButton(text="Спец. кнопки")
+            # KeyboardButton(text="Спец. кнопки")
         ]
     ],
     resize_keyboard=True,
@@ -64,14 +64,3 @@ def paginator(page: int = 0):
         width=2
     )
     return builder.as_markup()
-
-
-def objects_kb():
-    data = get_object_list()
-    items = [item["name"] for item in data]
-    builder = ReplyKeyboardBuilder()
-    [builder.button(text=item) for item in items]
-    builder.button(text="НАЗАД")
-    builder.adjust(*[1] * 4)
-
-    return builder.as_markup(resize_keyboard=True)

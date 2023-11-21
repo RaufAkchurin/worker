@@ -2,7 +2,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from telegram.API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
-    get_work_type_list_by_category_id
+    get_work_type_list_by_category_id, get_worker_list
 
 
 class ObjectCallbackFactory(CallbackData, prefix="object"):
@@ -26,6 +26,7 @@ def ObjectInlineKeyboard():
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
 
+
 ######################################################################################
 
 
@@ -35,7 +36,6 @@ class CategoryCallbackFactory(CallbackData, prefix="category"):
 
 
 def CategoryInlineKeyboard(object_id):
-
     categories = get_category_list_by_object_id(object_id)
     inline_keyboard = []
 
@@ -52,6 +52,7 @@ def CategoryInlineKeyboard(object_id):
     category_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return category_inline_markup
 
+
 ######################################################################################
 
 
@@ -61,7 +62,6 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
 
 
 def TypeInlineKeyboard(category_id):
-
     items = get_work_type_list_by_category_id(category_id)
     inline_keyboard = []
 
@@ -76,4 +76,8 @@ def TypeInlineKeyboard(category_id):
             )])
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
+
+
+######################################################################################
+
 
