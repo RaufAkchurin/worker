@@ -1,10 +1,9 @@
-from django.contrib import admin
 from django.contrib.admin import site
+from django.contrib import admin
+from django.http import HttpResponse
+import requests
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement
-
-
-# вдминке в типы работ добавить фильтр по категориям
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -13,7 +12,6 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
-# Register your models here.
 class WorkTypeAdmin(admin.ModelAdmin):
     raw_id_fields = ("category",)
     list_filter = ("category",)
@@ -25,11 +23,6 @@ class ShiftAdmin(admin.ModelAdmin):
     list_filter = ("work_type",)
     search_fields = ("name",)
 
-from django.contrib import admin
-from django.http import HttpResponse
-from django.urls import reverse
-import requests
-
 
 class ObjectAdmin(admin.ModelAdmin):
     actions = ['download_report']
@@ -39,7 +32,6 @@ class ObjectAdmin(admin.ModelAdmin):
         selected_id = queryset.values_list('id', flat=False)
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        # api_url = reverse('v1:generate_report', args=[3])  # Замените 'your_api_endpoint' на реальный endpoint вашего API
         response = requests.get(f"http://127.0.0.1:8000/api/v1/generate_report/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса

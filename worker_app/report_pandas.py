@@ -1,12 +1,10 @@
 from django.http import HttpResponse
 from django.views import View
 import pandas as pd
-from openpyxl import Workbook
 from openpyxl.styles import NamedStyle, Alignment, PatternFill, Font
-from django.db.models import F, Sum
+from django.db.models import F
 from openpyxl.utils import get_column_letter
 from rest_framework import status
-from rest_framework.response import Response
 
 from .models import Shift, WorkType, Object
 

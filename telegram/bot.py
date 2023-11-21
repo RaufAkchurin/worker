@@ -1,13 +1,11 @@
 import logging
 import sys
-
 from aiogram.enums import ParseMode
 import asyncio
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart
-from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.exceptions import TelegramBadRequest
 
@@ -44,7 +42,6 @@ smiles = [
 async def start(message: Message):
     user_id = message.from_user.username
     await message.answer(f"Hello, AIOgram 3.x! Your user ID is {user_id}", reply_markup=test_kb.main_kb)
-
 
 
 @dp.callback_query(test_kb.Pagination.filter(F.action.in_(["prev", "next"])))

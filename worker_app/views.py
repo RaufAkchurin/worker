@@ -1,11 +1,17 @@
 from rest_framework import viewsets, generics
 
-from worker_app.models import Category
+from worker_app.models import Category, Worker
 from worker_app.serializers import ObjectSerializer, WorkTypeSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Object
 from rest_framework.response import Response
+
+
+class WorkerListViewSet(viewsets.ModelViewSet):
+    serializer_class = ObjectSerializer
+    queryset = Worker.objects.all()
+
 
 class ObjectListViewSet(viewsets.ModelViewSet):
     serializer_class = ObjectSerializer
@@ -36,6 +42,7 @@ class CategoryListView(APIView):
 
 # для смены - если вводится тип-работ и дата  на которые уже есть запись -
 # спросить хочет ли он перезаписать и просто изменять данные
+
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views import View
