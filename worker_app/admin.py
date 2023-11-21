@@ -39,8 +39,8 @@ class ObjectAdmin(admin.ModelAdmin):
         selected_id = queryset.values_list('id', flat=False)
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        api_url = reverse('generate_report')  # Замените 'your_api_endpoint' на реальный endpoint вашего API
-        response = requests.get(api_url, params={'object_id': selected_id})
+        # api_url = reverse('v1:generate_report', args=[3])  # Замените 'your_api_endpoint' на реальный endpoint вашего API
+        response = requests.get(f"http://127.0.0.1:8000/api/v1/generate_report/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса
         if response.status_code == 200:
