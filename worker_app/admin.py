@@ -2,6 +2,7 @@ from django.contrib.admin import site
 from django.contrib import admin
 from django.http import HttpResponse
 import requests
+from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement
 
@@ -20,7 +21,9 @@ class WorkTypeAdmin(admin.ModelAdmin):
 
 class ShiftAdmin(admin.ModelAdmin):
     raw_id_fields = ("work_type",)
-    list_filter = ("work_type",)
+    list_filter = ("worker",
+                   "work_type",
+                   ('date', DateRangeFilter))
     search_fields = ("name",)
 
 
@@ -37,7 +40,8 @@ class ObjectAdmin(admin.ModelAdmin):
         # Проверяем успешность запроса
         if response.status_code == 200:
             # Создаем HTTP-ответ для скачивания файла
-            response = HttpResponse(response.content, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response = HttpResponse(response.content,
+                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename=report.xlsx'
             return response
         else:

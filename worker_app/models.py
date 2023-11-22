@@ -77,4 +77,4 @@ class Shift(models.Model):
         verbose_name_plural = 'Смены'
 
     def __str__(self):
-        return f"{self.worker.name} -- {self.date}"
+        return f"{self.worker.name} -- {self.work_type} -- {self.date}"
