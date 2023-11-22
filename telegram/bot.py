@@ -11,7 +11,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 import test_kb
 from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, CategoryCallbackFactory
-from telegram.log.workers_kb import WorkerInlineKeyboard
+from telegram.log.workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
@@ -98,6 +98,19 @@ async def process_category_press(callback: CallbackQuery,
         text=f'Айди категории: {callback_data.id}\n' \
              f'Название категории: {callback_data.name}\n',
         reply_markup=TypeInlineKeyboard(callback_data.id)
+    )
+
+#################################################################3###################################################
+
+
+@dp.callback_query(WorkerCallbackFactory.filter())
+async def process_category_press(callback: CallbackQuery,
+                                 callback_data: WorkerCallbackFactory):
+    await callback.message.answer(
+        text=f'Айди рабочего: {callback_data.id}\n' \
+             f'Выбрано имя: {callback_data.name}\n'\
+             'Введите пожалуйста пароль',
+        # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
 
 #################################################################3###################################################
