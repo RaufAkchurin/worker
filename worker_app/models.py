@@ -67,10 +67,10 @@ class WorkType(models.Model):
 
 
 class Shift(models.Model):
-    worker = models.ForeignKey('Worker', on_delete=models.CASCADE, verbose_name='Рабочий')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Рабочий')
     date = models.DateField(verbose_name='Дата')
-    work_types = models.ManyToManyField('WorkType', verbose_name='Типы работ')
-    values = models.ManyToManyField('WorkType', through='ShiftWorkType', verbose_name='Значения')
+    work_type = models.ForeignKey(WorkType, on_delete=models.CASCADE, verbose_name='Тип работ')
+    value = models.IntegerField(verbose_name='Выполненный объём')
 
     class Meta:
         verbose_name = 'Смена'
