@@ -1,5 +1,6 @@
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from telegram.API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
     get_work_type_list_by_category_id, get_worker_list
@@ -80,4 +81,11 @@ def TypeInlineKeyboard(category_id):
 
 ######################################################################################
 
+def profile_kb(text: str | list):
+    builder = ReplyKeyboardBuilder()
+    if isinstance(text, str):
+        text = [text]
+
+    [builder.button(text=txt) for txt in text]
+    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
 

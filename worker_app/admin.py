@@ -22,8 +22,9 @@ class WorkTypeAdmin(admin.ModelAdmin):
 class ShiftAdmin(admin.ModelAdmin):
     raw_id_fields = ("work_type",)
     list_filter = ("worker",
-                   "work_type",
-                   ('date', DateRangeFilter))
+                   ('date', DateRangeFilter),
+                   "work_type"
+                   )
     search_fields = ("name",)
 
 
@@ -47,7 +48,7 @@ class ObjectAdmin(admin.ModelAdmin):
         else:
             self.message_user(request, "Ошибка при скачивании отчета. Пожалуйста, повторите попытку.")
 
-    download_report.short_description = "Скачать отчет"
+    download_report.short_description = "Отчёт для заказчика скачать"
 
 
 site.register(Worker)

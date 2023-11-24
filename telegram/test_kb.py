@@ -22,7 +22,7 @@ main_kb = ReplyKeyboardMarkup(
         ]
     ],
     resize_keyboard=True,
-    one_time_keyboard=False,
+    one_time_keyboard=True,
     input_field_placeholder="Выберите действие из меню",
     selective=True
 )

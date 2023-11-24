@@ -73,8 +73,8 @@ class Shift(models.Model):
     value = models.IntegerField(verbose_name='Выполненный объём')
 
     class Meta:
-        verbose_name = 'Смена'
-        verbose_name_plural = 'Смены'
+        verbose_name = 'Результат за день'
+        verbose_name_plural = 'Результаты за день'
 
     def __str__(self):
         return f"{self.worker.name} -- {self.work_type} -- {self.date}"

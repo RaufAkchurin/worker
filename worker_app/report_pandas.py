@@ -57,6 +57,8 @@ class GenerateReportView(View):
             'quantity_shift': 'кол-во выполненное',
         })
 
+        print(merged_df.columns)
+
         # Вычисляем сумму для заказчика на оплату
         merged_df['сумма_заказчика'] = merged_df['кол-во выполненное'] * merged_df['price_for_customer']
 
