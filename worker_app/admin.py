@@ -4,7 +4,7 @@ from django.http import HttpResponse
 import requests
 from rangefilter.filter import DateRangeFilter
 
-from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement
+from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -36,7 +36,7 @@ class ObjectAdmin(admin.ModelAdmin):
         selected_id = queryset.values_list('id', flat=False)
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        response = requests.get(f"http://127.0.0.1:8000/api/v1/generate_report/{selected_id[0][0]}/")
+        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса
         if response.status_code == 200:
@@ -57,3 +57,4 @@ site.register(Measurement)
 site.register(WorkType, WorkTypeAdmin)
 site.register(Object, ObjectAdmin)
 site.register(Shift, ShiftAdmin)
+site.register(WorkersBenefits)

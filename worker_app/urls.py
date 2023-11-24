@@ -1,6 +1,6 @@
 from django.urls import path
 
-from worker_app.report_pandas import ReportCustomerView
+from worker_app.report_customer import ReportCustomerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
     WorkerListViewSet
 

@@ -78,3 +78,18 @@ class Shift(models.Model):
 
     def __str__(self):
         return f"{self.worker.name} -- {self.work_type} -- {self.date}"
+
+
+class WorkersBenefits(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Рабочий')
+    object = models.ForeignKey(Object, on_delete=models.CASCADE, verbose_name='Объект')
+    paid_amount = models.IntegerField(verbose_name='Выплаченная сумма')
+    date = models.DateField(verbose_name='Дата')
+
+    class Meta:
+        verbose_name = 'Выплата рабочему'
+        verbose_name_plural = 'Выплаты рабочим'
+
+    def __str__(self):
+        return f"{self.date.day}.{self.date.month}.{self.date.year} -- {self.worker.name} -- {self.object} -- {self.paid_amount}"
+
