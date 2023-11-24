@@ -39,7 +39,6 @@ class GenerateReportView(View):
             quantity_shift=F('value'),
             price_for_customer=F('work_type__price_for_customer'),
         )
-        print(shift_df)
 
         # Преобразуем queryset в DataFrame
         shift_df = pd.DataFrame(list(shift_df))
@@ -69,6 +68,9 @@ class GenerateReportView(View):
             'кол-во выполненное': 'sum',
             'сумма_заказчика': 'sum',
         }).reset_index()
+
+        # Calculate the overall total amount for the customer across all categories and work types
+        overall_total_customer_amount = grouped_df['сумма_заказчика'].sum()
 
         # Создаем Excel-файл
         excel_file_path = 'report.xlsx'
@@ -156,6 +158,18 @@ class GenerateReportView(View):
                 # Примените стиль к выбранным ячейкам
                 writer.sheets['WorkTypes'][cell_address_sum_customer].font = bold_font
                 writer.sheets['WorkTypes'][cell_address_sum].font = bold_font
+
+            # Добавляем строку с расчётом итоговой суммы по всему объекту для заказчика
+
+            column_letter_3 = get_column_letter(writer.sheets['WorkTypes'].max_column)
+            writer.sheets['WorkTypes'][
+                f'{column_letter_3}{writer.sheets["WorkTypes"].max_row + 2}'] = overall_total_customer_amount
+
+            column_letter_4 = get_column_letter(writer.sheets['WorkTypes'].max_column - 6)
+            writer.sheets['WorkTypes'][
+                f'{column_letter_4}{writer.sheets["WorkTypes"].max_row}'] = "По объекту"
+
+
 ###################################################################################################################
 
             # Устанавливаем ширину для объединенных ячеек
