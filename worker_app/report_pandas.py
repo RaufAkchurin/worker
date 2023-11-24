@@ -26,7 +26,6 @@ class GenerateReportView(View):
             'category__name',  # Include the category name for grouping
             'measurement_type__name',
             'total_scope',
-            'price_for_worker',
             'сумма',
         )
 
@@ -40,6 +39,7 @@ class GenerateReportView(View):
             quantity_shift=F('value'),
             price_for_customer=F('work_type__price_for_customer'),
         )
+        print(shift_df)
 
         # Преобразуем queryset в DataFrame
         shift_df = pd.DataFrame(list(shift_df))
@@ -53,14 +53,12 @@ class GenerateReportView(View):
             'category__name': 'Категория',  # Rename the category column
             'measurement_type__name': 'ед.изм.',
             'total_scope': 'кол-во',
-            'price_for_worker': 'цена',
+            'price_for_customer': 'цена',
             'quantity_shift': 'кол-во выполненное',
         })
 
-        print(merged_df.columns)
-
         # Вычисляем сумму для заказчика на оплату
-        merged_df['сумма_заказчика'] = merged_df['кол-во выполненное'] * merged_df['price_for_customer']
+        merged_df['сумма_заказчика'] = merged_df['кол-во выполненное'] * merged_df['цена']
 
         # Группируем данные по категории и типу работ, агрегируем значения
         grouped_df = merged_df.groupby(['Категория', 'Наименование работ']).agg({
