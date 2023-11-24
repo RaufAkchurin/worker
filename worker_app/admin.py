@@ -35,6 +35,8 @@ class ObjectAdmin(admin.ModelAdmin):
         # Получаем айди выбранных объектов
         selected_id = queryset.values_list('id', flat=False)
 
+        #TODO использовать реверс для построения ссылки для скачивания отчёта
+
         # Отправляем запрос на ваше API, передавая айди объектов
         response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
 
