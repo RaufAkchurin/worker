@@ -25,13 +25,13 @@ def get_category_list_by_object_id(object_id):
 
 
 def get_work_type_list_by_category_id(category_id):
-    url = f"{BASE_URL}/worktypes/category/{category_id}/"
+    url = f"{BASE_URL}/work_types/category/{category_id}/"
     response = requests.get(url=url)
     return response.json()
 
 
 def get_work_type_list_by_object_id(object_id):
-    url = f"{BASE_URL}/work_types_by_object/{object_id}/"
+    url = f"{BASE_URL}/work_types/object/{object_id}/"
     response = requests.get(url=url)
     return response.json()["work_types"]
 

@@ -9,7 +9,7 @@ from rest_framework import status
 from .models import Shift, WorkType, Object
 
 
-class GenerateReportView(View):
+class ReportCustomerView(View):
     def get(self, request, *args, **kwargs):
         # Извлекаем данные из базы
         object_id = kwargs.get("object_id", None)
@@ -53,11 +53,11 @@ class GenerateReportView(View):
             'measurement_type__name': 'ед.изм.',
             'total_scope': 'кол-во',
             'price_for_customer': 'цена',
-            'quantity_shift': 'кол-во выполненное',
+            'quantity_shift': 'кол-во факт',
         })
 
         # Вычисляем сумму для заказчика на оплату
-        merged_df['сумма_заказчика'] = merged_df['кол-во выполненное'] * merged_df['цена']
+        merged_df['сумма факт'] = merged_df['кол-во факт'] * merged_df['цена']
 
         # Группируем данные по категории и типу работ, агрегируем значения
         grouped_df = merged_df.groupby(['Категория', 'Наименование работ']).agg({
@@ -65,12 +65,12 @@ class GenerateReportView(View):
             'кол-во': 'first',
             'цена': 'first',
             'сумма': 'sum',
-            'кол-во выполненное': 'sum',
-            'сумма_заказчика': 'sum',
+            'кол-во факт': 'sum',
+            'сумма факт': 'sum',
         }).reset_index()
 
         # Calculate the overall total amount for the customer across all categories and work types
-        overall_total_customer_amount = grouped_df['сумма_заказчика'].sum()
+        overall_total_customer_amount = grouped_df['сумма факт'].sum()
 
         # Создаем Excel-файл
         excel_file_path = 'report.xlsx'
@@ -135,8 +135,8 @@ class GenerateReportView(View):
                 writer.sheets['WorkTypes'].append(list(category_row.iloc[0]), )
 
                 # Рассчитываем и добавляем итог для каждой категории в колонку "summa_zakazchika"
-                sum_customer_value = category_df['сумма_заказчика'].sum()
-                sum_customer_row = pd.DataFrame({'сумма_заказчика': [sum_customer_value]})
+                sum_customer_value = category_df['сумма факт'].sum()
+                sum_customer_row = pd.DataFrame({'сумма факт': [sum_customer_value]})
                 column_letter_1 = get_column_letter(writer.sheets['WorkTypes'].max_column)
                 writer.sheets['WorkTypes'][
                     f'{column_letter_1}{writer.sheets["WorkTypes"].max_row + 1}'] = sum_customer_value
@@ -167,7 +167,7 @@ class GenerateReportView(View):
 
             column_letter_4 = get_column_letter(writer.sheets['WorkTypes'].max_column - 6)
             writer.sheets['WorkTypes'][
-                f'{column_letter_4}{writer.sheets["WorkTypes"].max_row}'] = "По объекту"
+                f'{column_letter_4}{writer.sheets["WorkTypes"].max_row}'] = "ИТОГО по объекту"
 
             # Определите бирюзовый цвет
             turquoise_fill = PatternFill(start_color='00FFEE', end_color='00FFEE', fill_type='solid')

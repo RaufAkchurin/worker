@@ -1,18 +1,21 @@
 from django.urls import path
 
-from worker_app.report_pandas import GenerateReportView
+from worker_app.report_pandas import ReportCustomerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
     WorkerListViewSet
 
 urlpatterns = [
-    path("workers", WorkerListViewSet.as_view({'get': 'list', }), name="workers",),
+    path("workers", WorkerListViewSet.as_view({'get': 'list', }), name="workers", ),
 
-    path("objects", ObjectListViewSet.as_view({'get': 'list', }), name="objects",),
-    path('object/<int:object_id>/categories/', CategoryListView.as_view(), name='category-list'),
+    #  OBJECTS
+    path("objects", ObjectListViewSet.as_view({'get': 'list', }), name="objects", ),
+    path('object/<int:object_id>/categories/', CategoryListView.as_view(), name='object-categories'),
 
-    path('work_types_by_object/<int:object_id>/', WorkTypesByObjectView.as_view(), name='work_types_by_object'),
-    path('worktypes/category/<int:category_id>/', WorkTypeListByCategory.as_view(), name='worktype-list-by-category'),
+    #  WORK TYPES
+    path('work_types/object/<int:object_id>/', WorkTypesByObjectView.as_view(), name='work_types_by_object'),
+    path('work_types/category/<int:category_id>/', WorkTypeListByCategory.as_view(), name='work_types_by_category'),
 
-    path('generate_report/<int:object_id>/', GenerateReportView.as_view(), name='generate_report'),
+    #  REPORTS
+    path('report_customer/<int:object_id>/', ReportCustomerView.as_view(), name='report_customer'),
 
 ]
