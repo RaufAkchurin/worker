@@ -169,6 +169,17 @@ class GenerateReportView(View):
             writer.sheets['WorkTypes'][
                 f'{column_letter_4}{writer.sheets["WorkTypes"].max_row}'] = "По объекту"
 
+            # Определите бирюзовый цвет
+            turquoise_fill = PatternFill(start_color='00FFEE', end_color='00FFEE', fill_type='solid')
+
+            # Получите последнюю строку
+            last_row = writer.sheets['WorkTypes'].max_row
+
+            # Переберите ячейки в последней строке и установите цвет
+            for col_num in range(1, writer.sheets['WorkTypes'].max_column + 1):
+                cell = writer.sheets['WorkTypes'].cell(row=last_row, column=col_num)
+                cell.fill = turquoise_fill
+
 
 ###################################################################################################################
 
