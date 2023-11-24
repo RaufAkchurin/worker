@@ -1,7 +1,7 @@
 from django.urls import path
 
 from worker_app.report_customer import ReportCustomerView
-from worker_app.report_workers import  generate_report
+from worker_app.report_worker import ReportWorkerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
     WorkerListViewSet
 
@@ -18,7 +18,6 @@ urlpatterns = [
 
     #  REPORTS
     path('report_customer/<int:object_id>/', ReportCustomerView.as_view(), name='report_customer'),
-    # TODO  ниже отрефакторить как для заказчика чтобы выглядили пути и названия
-    path('generate_report/<int:object_id>/', generate_report, name='generate_report'),
+    path('report_worker/<int:object_id>/', ReportWorkerView.as_view(), name='report_worker'),
 
 ]
