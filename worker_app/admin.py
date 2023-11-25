@@ -6,6 +6,33 @@ from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits
 
+#TODO перепроверить автодата нигде не будет ли перезаписывать нчиего?
+#TODO ВИД таблиц сделать более информативным с помощью list_display где не указывали
+
+class ObjectAdmin(admin.ModelAdmin):
+    actions = ['download_report']
+
+    def download_report(self, request, queryset):
+        # Получаем айди выбранных объектов
+        selected_id = queryset.values_list('id', flat=False)
+
+        # TODO использовать реверс для построения ссылки для скачивания отчёта
+
+        # Отправляем запрос на ваше API, передавая айди объектов
+        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
+
+        # Проверяем успешность запроса
+        if response.status_code == 200:
+            # Создаем HTTP-ответ для скачивания файла
+            response = HttpResponse(response.content,
+                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+            return response
+        else:
+            self.message_user(request, "Ошибка при скачивании отчета. Пожалуйста, повторите попытку.")
+
+    download_report.short_description = "Отчёт для заказчика скачать"
+
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "object",)
@@ -38,38 +65,12 @@ class TravelBenefitsAdmin(admin.ModelAdmin):
     list_filter = ("object",
                    "worker",
                    ('date', DateRangeFilter),)
-
-    list_filter = ('worker', 'object', 'period')
+    list_display = ('worker', 'object', 'period', 'days_to_pay', 'rate', 'date')
 
     def formfield_for_choice_field(self, db_field, request, **kwargs):
         if db_field.name == 'period':
-            kwargs['choices'] = self.model.generate_period_choices()
+            kwargs['choices'] = TravelBenefits.generate_period_choices()
         return super().formfield_for_choice_field(db_field, request, **kwargs)
-
-
-class ObjectAdmin(admin.ModelAdmin):
-    actions = ['download_report']
-
-    def download_report(self, request, queryset):
-        # Получаем айди выбранных объектов
-        selected_id = queryset.values_list('id', flat=False)
-
-        # TODO использовать реверс для построения ссылки для скачивания отчёта
-
-        # Отправляем запрос на ваше API, передавая айди объектов
-        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
-
-        # Проверяем успешность запроса
-        if response.status_code == 200:
-            # Создаем HTTP-ответ для скачивания файла
-            response = HttpResponse(response.content,
-                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename=report.xlsx'
-            return response
-        else:
-            self.message_user(request, "Ошибка при скачивании отчета. Пожалуйста, повторите попытку.")
-
-    download_report.short_description = "Отчёт для заказчика скачать"
 
 
 site.register(Worker)

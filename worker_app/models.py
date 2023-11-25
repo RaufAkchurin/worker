@@ -94,23 +94,10 @@ class WorkersBenefits(models.Model):
         return f"{self.date.day}.{self.date.month}.{self.date.year} -- {self.worker.name} -- {self.object} -- {self.paid_amount}"
 
 
-class MonthYearField(models.DateField):
-    def __init__(self, *args, **kwargs):
-        kwargs['null'] = True
-        kwargs['blank'] = True
-        kwargs['default'] = None
-        super().__init__(*args, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'input_formats': ['%Y-%m']}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
-
-
 class TravelBenefits(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Рабочий')
     object = models.ForeignKey(Object, on_delete=models.CASCADE, verbose_name='Объект')
-    period = models.CharField(max_length=7, choices=[], verbose_name='За период')
+    period = models.CharField(max_length=7, verbose_name='За период')
     days_to_pay = models.IntegerField(verbose_name='Дней к оплате')
     rate = models.IntegerField(verbose_name='Сумма в день', default=700)
     date = models.DateField(verbose_name='Дата выплаты')
@@ -120,16 +107,13 @@ class TravelBenefits(models.Model):
         verbose_name_plural = 'Командировочные выплаты'
         unique_together = ('worker', 'object', 'period')
 
-    def __init__(self, *args, **kwargs):
-        super(TravelBenefits, self).__init__(*args, **kwargs)
-        self._meta.get_field('period').choices = self.generate_period_choices()
+    def __str__(self):
+        return f"{self.worker.name} -- {self.object} -- {self.period} -- {self.date}"
 
-    def generate_period_choices(self):
+    @staticmethod
+    def generate_period_choices():
         choices = []
         for year in range(2023, 2030):  # Выберите нужный диапазон лет
             for month in range(1, 13):
-                choices.append((f"{year}-{month:02d}", f"{month:02d}-{year}"))
+                choices.append((f"{year}-{month:02d}", f"{month:02d}/{year}"))
         return choices
-
-    def __str__(self):
-        return f"{self.worker.name} -- {self.object} --за период {self.period}"
