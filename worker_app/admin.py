@@ -4,7 +4,7 @@ from django.http import HttpResponse
 import requests
 from rangefilter.filter import DateRangeFilter
 
-from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits
+from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -32,6 +32,19 @@ class WorkersBenefitsAdmin(admin.ModelAdmin):
     list_filter = ("object",
                    "worker",
                    ('date', DateRangeFilter),)
+
+
+class TravelBenefitsAdmin(admin.ModelAdmin):
+    list_filter = ("object",
+                   "worker",
+                   ('date', DateRangeFilter),)
+
+    list_filter = ('worker', 'object', 'period')
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == 'period':
+            kwargs['choices'] = self.model.generate_period_choices()
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
 
 
 class ObjectAdmin(admin.ModelAdmin):
@@ -66,3 +79,4 @@ site.register(WorkType, WorkTypeAdmin)
 site.register(Object, ObjectAdmin)
 site.register(Shift, ShiftAdmin)
 site.register(WorkersBenefits, WorkersBenefitsAdmin)
+site.register(TravelBenefits, TravelBenefitsAdmin)
