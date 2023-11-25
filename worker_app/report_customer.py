@@ -73,8 +73,8 @@ class ReportCustomerView(View):
         overall_total_customer_amount = grouped_df['сумма факт'].sum()
 
         # Создаем Excel-файл
-        excel_file_path = 'report.xlsx'
-        with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
+        report_path = 'report_customer.xlsx'
+        with pd.ExcelWriter(report_path, engine='openpyxl') as writer:
             # Создаем пустой лист 'WorkTypes'
             writer.book.create_sheet('WorkTypes')
 #####################################################################################################################
@@ -198,9 +198,9 @@ class ReportCustomerView(View):
                 writer.sheets['WorkTypes'].column_dimensions[col_letter].width = width
 
         # Отправляем файл пользователю
-        with open(excel_file_path, 'rb') as excel:
+        with open(report_path, 'rb') as excel:
             response = HttpResponse(excel.read(),
                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+            response['Content-Disposition'] = 'attachment; filename=report_customer.xlsx'
 
         return response

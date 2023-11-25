@@ -6,13 +6,14 @@ from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits
 
-#TODO перепроверить автодата нигде не будет ли перезаписывать нчиего?
-#TODO ВИД таблиц сделать более информативным с помощью list_display где не указывали
+# TODO перепроверить автодата нигде не будет ли перезаписывать нчиего?
+# TODO ВИД таблиц сделать более информативным с помощью list_display где не указывали
+
 
 class ObjectAdmin(admin.ModelAdmin):
-    actions = ['download_report']
+    actions = ['download_report_customer', 'download_report_worker']
 
-    def download_report(self, request, queryset):
+    def download_report_customer(self, request, queryset):
         # Получаем айди выбранных объектов
         selected_id = queryset.values_list('id', flat=False)
 
@@ -26,12 +27,32 @@ class ObjectAdmin(admin.ModelAdmin):
             # Создаем HTTP-ответ для скачивания файла
             response = HttpResponse(response.content,
                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename=report.xlsx'
+            response['Content-Disposition'] = 'attachment; filename=report_customer.xlsx'
             return response
         else:
             self.message_user(request, "Ошибка при скачивании отчета. Пожалуйста, повторите попытку.")
 
-    download_report.short_description = "Отчёт для заказчика скачать"
+    def download_report_worker(self, request, queryset):
+        # Получаем айди выбранных объектов
+        selected_id = queryset.values_list('id', flat=False)
+
+        # TODO использовать реверс для построения ссылки для скачивания отчёта
+
+        # Отправляем запрос на ваше API, передавая айди объектов
+        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_worker/{selected_id[0][0]}/")
+
+        # Проверяем успешность запроса
+        if response.status_code == 200:
+            # Создаем HTTP-ответ для скачивания файла
+            response = HttpResponse(response.content,
+                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename=report_worker.xlsx'
+            return response
+        else:
+            self.message_user(request, "Ошибка при скачивании отчета. Пожалуйста, повторите попытку.")
+
+    download_report_customer.short_description = "Отчёт для заказчика скачать"
+    download_report_worker.short_description = "Отчёт для рабочего скачать"
 
 
 class CategoryAdmin(admin.ModelAdmin):

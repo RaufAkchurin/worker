@@ -87,8 +87,13 @@ class ReportWorkerView(View):
         worksheet.cell(row=row_num, column=5, value=remaining_balance)
 
         # Сохраняем файл
-        report_path = f'report_workers/report_{selected_object.name}.xlsx'
+        report_path = f'report_worker.xlsx'
         workbook.save(report_path)
 
-        # Возвращаем путь к файлу
-        return JsonResponse({'report_path': report_path})
+        # Отправляем файл пользователю
+        with open(report_path, 'rb') as excel:
+            response = HttpResponse(excel.read(),
+                                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename=report_worker.xlsx'
+
+        return response
