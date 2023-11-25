@@ -75,6 +75,10 @@ class ReportWorkerView(View):
 
         # Добавляем строки для выплат и остатков
         row_num += 1
+        worksheet.cell(row=row_num, column=1, value='ИТОГО')
+        worksheet.cell(row=row_num, column=5, value=total_amount)
+
+        row_num += 1
         worksheet.cell(row=row_num, column=1, value='ВЫПЛАЧЕНО')
         worksheet.cell(row=row_num, column=5, value=total_payments)
 

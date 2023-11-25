@@ -21,11 +21,17 @@ class WorkTypeAdmin(admin.ModelAdmin):
 
 class ShiftAdmin(admin.ModelAdmin):
     raw_id_fields = ("work_type",)
-    list_filter = ("worker",
+    list_filter = ("work_type__category__object",
+                   "worker",
                    ('date', DateRangeFilter),
-                   "work_type"
-                   )
+                   "work_type",)
     search_fields = ("name",)
+
+
+class WorkersBenefitsAdmin(admin.ModelAdmin):
+    list_filter = ("object",
+                   "worker",
+                   ('date', DateRangeFilter),)
 
 
 class ObjectAdmin(admin.ModelAdmin):
@@ -35,7 +41,7 @@ class ObjectAdmin(admin.ModelAdmin):
         # Получаем айди выбранных объектов
         selected_id = queryset.values_list('id', flat=False)
 
-        #TODO использовать реверс для построения ссылки для скачивания отчёта
+        # TODO использовать реверс для построения ссылки для скачивания отчёта
 
         # Отправляем запрос на ваше API, передавая айди объектов
         response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
@@ -59,4 +65,4 @@ site.register(Measurement)
 site.register(WorkType, WorkTypeAdmin)
 site.register(Object, ObjectAdmin)
 site.register(Shift, ShiftAdmin)
-site.register(WorkersBenefits)
+site.register(WorkersBenefits, WorkersBenefitsAdmin)
