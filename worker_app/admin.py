@@ -6,9 +6,6 @@ from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits
 
-# TODO перепроверить автодата нигде не будет ли перезаписывать нчиего?
-# TODO ВИД таблиц сделать более информативным с помощью list_display где не указывали
-
 
 class ObjectAdmin(admin.ModelAdmin):
     actions = ['download_report_customer', 'download_report_worker']
@@ -55,6 +52,10 @@ class ObjectAdmin(admin.ModelAdmin):
     download_report_worker.short_description = "Отчёт для рабочего скачать"
 
 
+class WorkerAdmin(admin.ModelAdmin):
+    list_display = ("name", "surname", "password", "telegram_id",)
+
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "object",)
     list_filter = ("object",)
@@ -65,6 +66,7 @@ class WorkTypeAdmin(admin.ModelAdmin):
     raw_id_fields = ("category",)
     list_filter = ("category",)
     search_fields = ("name",)
+    list_display = ("category", "name", "price_for_worker", "price_for_customer", "total_scope", "measurement_type",)
 
 
 class ShiftAdmin(admin.ModelAdmin):
@@ -74,12 +76,14 @@ class ShiftAdmin(admin.ModelAdmin):
                    ('date', DateRangeFilter),
                    "work_type",)
     search_fields = ("name",)
+    list_display = ("worker", "date", "work_type", "value",)
 
 
 class WorkersBenefitsAdmin(admin.ModelAdmin):
     list_filter = ("object",
                    "worker",
                    ('date', DateRangeFilter),)
+    list_display = ('worker', 'object', 'paid_amount', 'date')
 
 
 class TravelBenefitsAdmin(admin.ModelAdmin):
@@ -94,7 +98,7 @@ class TravelBenefitsAdmin(admin.ModelAdmin):
         return super().formfield_for_choice_field(db_field, request, **kwargs)
 
 
-site.register(Worker)
+site.register(Worker, WorkerAdmin)
 site.register(Category, CategoryAdmin)
 site.register(Measurement)
 site.register(WorkType, WorkTypeAdmin)

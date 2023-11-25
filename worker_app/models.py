@@ -1,5 +1,7 @@
 from django.db import models
 
+# TODO перепроверить автодата нигде не будет ли перезаписывать нчиего?
+
 
 class Worker(models.Model):
     name = models.CharField(max_length=10, verbose_name='Имя')
