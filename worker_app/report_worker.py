@@ -28,7 +28,9 @@ class ReportWorkerView(View):
         travels = Travel.objects.filter(object=selected_object)
 
         # Получаем список всех работников
-        workers = {travel.worker for travel in travels}
+        workers_from_travels = {travel.worker for travel in travels}
+        workers_from_shifts = {shift.worker for shift in shifts}
+        workers = workers_from_travels.union(workers_from_shifts)
 
         # Создаем новый Excel файл
         workbook = Workbook()
@@ -40,9 +42,16 @@ class ReportWorkerView(View):
             # Названия колонок
             columns = ['Название работ', 'ед. изм.', 'кол-во', 'цена', 'сумма']
 
+            # Добавляем строку с фамилией и именем рабочего над заголовками
+            worker_name_row = worksheet.cell(row=1, column=1, value=f'{worker.surname}  {worker.name}')
+            worker_name_row.font = Font(bold=True)
+            worksheet.merge_cells(start_row=1, start_column=1, end_row=1,
+                                  end_column=5)  # Объединяем ячейки на 5 колонок
+            worksheet['A1'].alignment = Alignment(horizontal='center')  # Align the text in the merged cell to center
+
             # Записываем заголовки в файл для смен
             for col_num, column_title in enumerate(columns, 1):
-                cell = worksheet.cell(row=1, column=col_num)
+                cell = worksheet.cell(row=2, column=col_num)  # Начинаем с новой строки (2)
                 cell.value = column_title
                 cell.alignment = Alignment(horizontal='center')
                 cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
@@ -61,7 +70,7 @@ class ReportWorkerView(View):
             worksheet.column_dimensions[get_column_letter(5)].width = 20
 
             # Записываем данные для выполненных работ
-            row_num = 2
+            row_num = 3
             total_amount = 0
 
             for work_type in WorkType.objects.all():
@@ -147,6 +156,10 @@ class ReportWorkerView(View):
             row_num += 1
             worksheet.cell(row=row_num, column=1, value='ОСТАТКИ К ВЫПЛАТЕ')
             worksheet.cell(row=row_num, column=5, value=total_remaining_balance)
+
+        # Удаляем первый лист тк он пустой (не понял где создаётся пока)
+        first_sheet = workbook.sheetnames[0]
+        workbook.remove(workbook[first_sheet])
 
         # Сохраняем файл
         report_path = f'report_worker.xlsx'
