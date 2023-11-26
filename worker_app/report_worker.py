@@ -31,7 +31,6 @@ class ReportWorkerView(View):
         # Получаем все командировки для данного объекта
         travels = Travel.objects.filter(object=selected_object)
 
-
         # Создаем новый Excel файл
         workbook = Workbook()
         worksheet = workbook.active
@@ -42,19 +41,10 @@ class ReportWorkerView(View):
 
         # Названия колонок
         columns = ['Название работ', 'ед. изм.', 'кол-во', 'цена', 'сумма']
-        columns_travel = ['Месяц', 'Рабочий', 'Дней в командировке', 'Командировочные за месяц', 'Выплачено',
-                          'Остаток к выплате']
 
         # Записываем заголовки в файл для смен
         for col_num, column_title in enumerate(columns, 1):
             cell = worksheet.cell(row=1, column=col_num)
-            cell.value = column_title
-            cell.alignment = Alignment(horizontal='center')
-            cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
-
-        # Записываем заголовки в файл для командировок
-        for col_num, column_title in enumerate(columns_travel, 1):
-            cell = worksheet.cell(row=1, column=len(columns) + col_num)
             cell.value = column_title
             cell.alignment = Alignment(horizontal='center')
             cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
@@ -78,34 +68,14 @@ class ReportWorkerView(View):
                 total_price = total_scope * price_for_worker
 
                 worksheet.cell(row=row_num, column=1, value=work_type.name)
-                worksheet.cell(row=row_num, column=2, value=work_type.measurement_type.name).alignment = Alignment(horizontal='center')
+                worksheet.cell(row=row_num, column=2, value=work_type.measurement_type.name).alignment = Alignment(
+                    horizontal='center')
                 worksheet.cell(row=row_num, column=3, value=total_scope).alignment = Alignment(horizontal='center')
                 worksheet.cell(row=row_num, column=4, value=price_for_worker)
                 worksheet.cell(row=row_num, column=5, value=total_price)
 
                 total_amount += total_price
                 row_num += 1
-
-        # Записываем данные для командировок
-        for travel in travels:
-            # Calculate days in travel
-            finish = travel.date_finish or datetime.date.today()
-            days_in_travel = (finish - travel.date_start).days + 1
-
-            worksheet.cell(row=row_num, column=len(columns) + 1,
-                           value=travel.date_start.strftime('%B'))  # Month
-            worksheet.cell(row=row_num, column=len(columns) + 2, value=str(travel.worker))  # Worker
-            worksheet.cell(row=row_num, column=len(columns) + 3, value=days_in_travel)  # Days in travel
-            worksheet.cell(row=row_num, column=len(columns) + 4,
-                           value=days_in_travel * travel.rate)  # Total for the month
-            worksheet.cell(row=row_num, column=len(columns) + 5,
-                           value=TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
-                                     'paid_for_travel__sum'] or 0)  # Paid
-            worksheet.cell(row=row_num, column=len(columns) + 6, value=(days_in_travel * travel.rate) - (
-                        TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
-                            'paid_for_travel__sum'] or 0))  # Remaining balance
-
-            row_num += 1
 
         # Расчет выплат и остатков
         payments = WorkersBenefits.objects.filter(object=selected_object)
@@ -124,6 +94,49 @@ class ReportWorkerView(View):
         row_num += 1
         worksheet.cell(row=row_num, column=1, value='ОСТАТКИ К ВЫПЛАТЕ')
         worksheet.cell(row=row_num, column=5, value=remaining_balance)
+
+        columns_travel = ['Рабочий', 'дней', 'к оплате', 'выплачено', 'остаток']
+
+        # Записываем заголовки в файл для командировок
+
+        row_num += 5
+        for col_num, column_title in enumerate(columns_travel, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = column_title
+            cell.alignment = Alignment(horizontal='center')
+            cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
+
+        # Записываем данные для командировок
+        row_num += 2
+        total_remaining_balance = 0
+        for travel in travels:
+            # Calculate days in travel
+            finish = travel.date_finish or datetime.date.today()
+            days_in_travel = (finish - travel.date_start).days + 1
+
+            worksheet.cell(row=row_num, column=1,
+                           value=str(travel.worker) + "   " + travel.date_start.strftime('%B'))  # Worker + Month
+            worksheet.cell(row=row_num, column=2, value=days_in_travel)  # Days in travel
+            worksheet.cell(row=row_num, column=3,
+                           value=days_in_travel * travel.rate)  # Total for the month
+            worksheet.cell(row=row_num, column=4,
+                           value=TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
+                                     'paid_for_travel__sum'] or 0)  # Paid
+
+            # Remaining balance
+            remaining_balance = (days_in_travel * travel.rate) - (
+                    TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
+                        'paid_for_travel__sum'] or 0)
+            worksheet.cell(row=row_num, column=5, value=remaining_balance)  # Remaining balance
+            total_remaining_balance += remaining_balance
+
+            # Пустая строка после каждой записи
+            row_num += 1
+
+            # Добавляем строки для выплат и остатков
+            row_num += 1
+        worksheet.cell(row=row_num, column=1, value='ОСТАТКИ К ВЫПЛАТЕ')
+        worksheet.cell(row=row_num, column=5, value=total_remaining_balance)
 
         # Сохраняем файл
         report_path = f'report_worker.xlsx'
