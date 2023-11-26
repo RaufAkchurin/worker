@@ -96,26 +96,31 @@ class WorkersBenefits(models.Model):
         return f"{self.date.day}.{self.date.month}.{self.date.year} -- {self.worker.name} -- {self.object} -- {self.paid_amount}"
 
 
-class TravelBenefits(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Рабочий')
+class Travel(models.Model):
     object = models.ForeignKey(Object, on_delete=models.CASCADE, verbose_name='Объект')
-    period = models.CharField(max_length=7, verbose_name='За период')
-    days_to_pay = models.IntegerField(verbose_name='Дней к оплате')
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Рабочий')
     rate = models.IntegerField(verbose_name='Сумма в день', default=700)
+
+    date_start = models.DateField(verbose_name='Начало командировки')
+    date_finish = models.DateField(verbose_name='Окончание командировки', blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Командировка'
+        verbose_name_plural = 'Командировки'
+
+    def __str__(self):
+        return f"{self.object}  --  {self.worker}  --  {self.date_start}"
+
+
+class TravelBenefits(models.Model):
+    travel = models.ForeignKey(Travel, on_delete=models.CASCADE, verbose_name='Командировка')
+    paid_for_travel = models.IntegerField(verbose_name='Выплаченно за командировку')
+
     date = models.DateField(verbose_name='Дата выплаты')
 
     class Meta:
         verbose_name = 'Командировочная выплата'
         verbose_name_plural = 'Командировочные выплаты'
-        unique_together = ('worker', 'object', 'period')
 
     def __str__(self):
-        return f"{self.worker.name} -- {self.object} -- {self.period} -- {self.date}"
-
-    @staticmethod
-    def generate_period_choices():
-        choices = []
-        for year in range(2023, 2030):  # Выберите нужный диапазон лет
-            for month in range(1, 13):
-                choices.append((f"{year}-{month:02d}", f"{month:02d}/{year}"))
-        return choices
+        return f"Выплата за командировку №{self.pk}"

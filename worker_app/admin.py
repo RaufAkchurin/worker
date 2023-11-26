@@ -4,7 +4,8 @@ from django.http import HttpResponse
 import requests
 from rangefilter.filter import DateRangeFilter
 
-from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits
+from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits, \
+    Travel
 
 
 class ObjectAdmin(admin.ModelAdmin):
@@ -86,23 +87,32 @@ class WorkersBenefitsAdmin(admin.ModelAdmin):
     list_display = ('worker', 'object', 'paid_amount', 'date')
 
 
-class TravelBenefitsAdmin(admin.ModelAdmin):
-    list_filter = ("object",
-                   "worker",
-                   ('date', DateRangeFilter),)
-    list_display = ('worker', 'object', 'period', 'days_to_pay', 'rate', 'date')
+######################################### TRAVELS #########################################
 
-    def formfield_for_choice_field(self, db_field, request, **kwargs):
-        if db_field.name == 'period':
-            kwargs['choices'] = TravelBenefits.generate_period_choices()
-        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
+class TravelBenefitsInline(admin.TabularInline):  # Только для отображения выплат внеутри категории командировки
+    model = TravelBenefits
+    extra = 1  # Количество дополнительных форм для добавления выплаты прямо в интерфейсе командировки
+
+
+class TravelAdmin(admin.ModelAdmin):
+    inlines = [TravelBenefitsInline]
+    list_display = ("object", "worker", "rate", "date_start", "date_finish",)
+
+
+class TravelBenefitsAdmin(admin.ModelAdmin):
+    list_display = ("travel", "paid_for_travel", "date")
+    list_filter = ("travel__worker", "travel__object")
 
 
 site.register(Worker, WorkerAdmin)
-site.register(Category, CategoryAdmin)
 site.register(Measurement)
 site.register(WorkType, WorkTypeAdmin)
 site.register(Object, ObjectAdmin)
+site.register(Category, CategoryAdmin)
 site.register(Shift, ShiftAdmin)
 site.register(WorkersBenefits, WorkersBenefitsAdmin)
+
+
+site.register(Travel, TravelAdmin)
 site.register(TravelBenefits, TravelBenefitsAdmin)
