@@ -3,15 +3,12 @@ import datetime
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, PatternFill
+from openpyxl.styles import Alignment, PatternFill, Font, Border, Side
 from django.db.models import Sum
 from openpyxl.utils import get_column_letter
 from rest_framework import status
 
 from worker_app.models import Object, Shift, WorkType, WorkersBenefits, Travel, TravelBenefits
-
-
-# TODO исключить 500 если нет данных для отчёта (несущ айди )
 
 
 class ReportWorkerView(View):
@@ -35,10 +32,6 @@ class ReportWorkerView(View):
         workbook = Workbook()
         worksheet = workbook.active
 
-        # Создаем новый Excel файл
-        workbook = Workbook()
-        worksheet = workbook.active
-
         # Названия колонок
         columns = ['Название работ', 'ед. изм.', 'кол-во', 'цена', 'сумма']
 
@@ -48,6 +41,12 @@ class ReportWorkerView(View):
             cell.value = column_title
             cell.alignment = Alignment(horizontal='center')
             cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
+            cell.font = Font(bold=True)  # Make the text bold
+
+            # Adding thin borders
+            thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
+                                 bottom=Side(style='thin'))
+            cell.border = thin_border
 
         # # Устанавливаем ширину колонок
         worksheet.column_dimensions[get_column_letter(1)].width = 40
@@ -105,6 +104,12 @@ class ReportWorkerView(View):
             cell.value = column_title
             cell.alignment = Alignment(horizontal='center')
             cell.fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')  # Yellow fill
+            cell.font = Font(bold=True)  # Make the text bold
+
+            # Adding thin borders
+            thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'),
+                                 bottom=Side(style='thin'))
+            cell.border = thin_border
 
         # Записываем данные для командировок
         row_num += 2
@@ -121,7 +126,7 @@ class ReportWorkerView(View):
                            value=days_in_travel * travel.rate)  # Total for the month
             worksheet.cell(row=row_num, column=4,
                            value=TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
-                                     'paid_for_travel__sum'] or 0)  # Paid
+                               'paid_for_travel__sum'] or 0)  # Paid
 
             # Remaining balance
             remaining_balance = (days_in_travel * travel.rate) - (
@@ -133,8 +138,8 @@ class ReportWorkerView(View):
             # Пустая строка после каждой записи
             row_num += 1
 
-            # Добавляем строки для выплат и остатков
-            row_num += 1
+        # Добавляем строки для выплат и остатков
+        row_num += 1
         worksheet.cell(row=row_num, column=1, value='ОСТАТКИ К ВЫПЛАТЕ')
         worksheet.cell(row=row_num, column=5, value=total_remaining_balance)
 
