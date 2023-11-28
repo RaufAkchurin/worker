@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 import asyncio
 
@@ -12,20 +13,24 @@ from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, Cate
     CategoryCallbackFactory, profile_kb
 from telegram.log.workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
 from telegram.utils.states import Form
+import os
+from dotenv import load_dotenv
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
 # TODO: Убрать все секретные данные в отдельный файл
 
 
+# Загрузка переменных окружения из файла .env
+load_dotenv()
+
 BOT_LINK = "t.me/stroyka_worker_bot"
-TOKEN_API = "6769629902:AAGJf0olx2jc3hDADb-HFVYJzWgXFPLNGB8"
 HELP_COMMAND = """
 /help - список команд
 /start - начать работу с ботом
 """
 
-bot = Bot(TOKEN_API)
+bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
 
