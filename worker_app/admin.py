@@ -98,6 +98,7 @@ class TravelBenefitsInline(admin.TabularInline):  # Только для отоб
 class TravelAdmin(admin.ModelAdmin):
     inlines = [TravelBenefitsInline]
     list_display = ("object", "worker", "rate", "date_start", "date_finish",)
+    list_filter = ("worker", "object")
 
 
 class TravelBenefitsAdmin(admin.ModelAdmin):
