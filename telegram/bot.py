@@ -8,10 +8,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import test_kb
-from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
+from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory
-from telegram.workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
-from telegram.states import Form
+from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
+from states import Form
 import os
 from dotenv import load_dotenv
 

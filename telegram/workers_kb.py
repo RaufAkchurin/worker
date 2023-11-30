@@ -1,7 +1,7 @@
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from telegram.API import get_worker_list
+from API import get_worker_list
 
 
 class WorkerCallbackFactory(CallbackData, prefix="worker"):
