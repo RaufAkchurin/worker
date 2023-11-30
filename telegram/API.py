@@ -1,6 +1,11 @@
-import requests
+import os
 
-BASE_URL = "http://31.129.103.105:8000/api/v1"
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BASE_URL = 'http://' + os.getenv('LOCALHOST_IP') + '/api/v1'
 
 
 def get_object_list():
