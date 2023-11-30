@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://localhost:8000/api/v1"
+BASE_URL = "http://31.129.103.105:8000/api/v1"
 
 
 def get_object_list():
