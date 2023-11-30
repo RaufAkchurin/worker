@@ -8,8 +8,6 @@ from aiogram.types import (
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 
-from telegram.API import get_object_list
-
 main_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
