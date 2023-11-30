@@ -1,18 +1,17 @@
 import logging
-import os
 import sys
 import asyncio
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command, state, CommandStart
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import test_kb
 from telegram.keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory, profile_kb
-from telegram.log.workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
-from telegram.utils.states import Form
+    CategoryCallbackFactory
+from telegram.workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
+from telegram.states import Form
 import os
 from dotenv import load_dotenv
 
