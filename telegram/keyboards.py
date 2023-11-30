@@ -2,7 +2,8 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-from worker_app.telegram.API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_category_id
+from telegram.API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
+    get_work_type_list_by_category_id, get_worker_list
 
 
 class ObjectCallbackFactory(CallbackData, prefix="object"):
