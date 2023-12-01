@@ -1,2 +1,3 @@
 devops_info.env
 .env
+*.pyc
