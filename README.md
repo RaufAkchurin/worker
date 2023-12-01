@@ -27,3 +27,39 @@
    Замените PID на фактический идентификатор процесса.
 
          _НАСТРОЙКА АВТОМАТИЧЕСКОГО РЕСТАРТА В СЛУЧАЕ ПАДЕНИЯ_
+
+
+        НАСТРОЙКА systemctl (автоматический перезапуск в случае падения)
+
+**Создайте файл службы:**
+sudo nano /etc/systemd/system/worker.service
+
+
+**Добавьте следующую конфигурацию в файл службы:**
+
+
+[Unit]
+Description=Django and Bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/worker
+ExecStart=/root/worker/venv/bin/python3 /root/worker/manage.py runserver 555.444.666.777:8000(вставить реальный)
+KillMode=process
+Restart=always
+RestartSec=10
+EnvironmentFile=/root/worker/.env
+ExecStartPost=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+            **ПОСЛЕ ПАРВОК В КОНФИГЕ**
+**sudo systemctl daemon-reload**
+**sudo systemctl start worker**
+статус проверять вот так **systemctl status worker.service**
+
+
