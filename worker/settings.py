@@ -14,7 +14,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['31.129.103.105', '127.0.0.1']
+ALLOWED_HOSTS = ['rting-erp.ru', '31.129.103.105', '127.0.0.1']
 
 
 # Application definition
