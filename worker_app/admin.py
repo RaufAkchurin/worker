@@ -1,11 +1,18 @@
+import os
+
 from django.contrib.admin import site
 from django.contrib import admin
 from django.http import HttpResponse
 import requests
+from dotenv import load_dotenv
 from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits, \
     Travel
+
+load_dotenv()
+
+LOCALHOST_IP = os.getenv('LOCALHOST_IP')
 
 
 class ObjectAdmin(admin.ModelAdmin):
@@ -18,7 +25,7 @@ class ObjectAdmin(admin.ModelAdmin):
         # TODO использовать реверс для построения ссылки для скачивания отчёта
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_customer/{selected_id[0][0]}/")
+        response = requests.get(f"http://{LOCALHOST_IP}/api/v1/report_customer/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса
         if response.status_code == 200:
@@ -37,7 +44,7 @@ class ObjectAdmin(admin.ModelAdmin):
         # TODO использовать реверс для построения ссылки для скачивания отчёта
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        response = requests.get(f"http://127.0.0.1:8000/api/v1/report_worker/{selected_id[0][0]}/")
+        response = requests.get(f"http://{LOCALHOST_IP}/api/v1/report_worker/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса
         if response.status_code == 200:
