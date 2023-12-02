@@ -25,17 +25,13 @@ def push_to_github(repo_path, github_token, commit_message):
         file_content_obj = repo.get_contents(file_path, ref=branch)
         sha_current_content = file_content_obj.sha
 
-        # Создание нового коммита с обновленным файлом
-        repo.create_commit(
-            message=commit_message,
-            tree=repo.get_git_tree(sha_latest_commit),
-            parents=[sha_latest_commit],
-            updates=[{
-                "path": file_path,
-                "mode": "100644",
-                "content": content,
-                "sha": sha_current_content
-            }]
+        # Обновление файла с предоставлением sha
+        repo.update_file(
+            file_path,
+            commit_message,
+            content,
+            sha_current_content,  # Используем SHA текущего содержимого файла
+            branch=branch
         )
 
         print(f'Successfully pushed to GitHub at {time.ctime()}')
