@@ -2,7 +2,6 @@ import time
 from dotenv import load_dotenv
 from github import Github
 import os
-from git import Repo
 
 load_dotenv()
 
@@ -13,35 +12,33 @@ def push_to_github(repo_path, github_token, commit_message):
         repo = g.get_repo("RaufAkchurin/worker")
 
         branch = "master"  # Замените "master" на вашу ветку
+        file_path = "db.sqlite3"
+        full_path = os.path.join(repo_path, file_path)
 
-        # Инициализация объекта Git для репозитория
-        git_repo = Repo(repo_path)
+        # Получение хэша последнего коммита в ветке
+        sha_latest_commit = repo.get_branch(branch).commit.sha
 
-        # Проверка статуса репозитория
-        if git_repo.is_dirty(untracked_files=True):
-            # Получение хэша последнего коммита в ветке
-            sha_latest_commit = repo.get_branch(branch).commit.sha
+        with open(full_path, 'rb') as file_content:
+            content = file_content.read().decode('utf-8')  # Декодируем содержимое файла
 
-            # Проверка, является ли файл db.sqlite3 неотслеживаемым
-            untracked_files = git_repo.untracked_files
-            if "db.sqlite3" in untracked_files:
-                # Обновление файла
-                with open(os.path.join(repo_path, "db.sqlite3"), 'rb') as file_content:
-                    content = file_content.read()
+        # Получение текущего содержимого файла
+        file_content_obj = repo.get_contents(file_path, ref=branch)
+        content_latest_commit = file_content_obj.decoded_content.decode('utf-8')
 
-                repo.update_file(
-                    "db.sqlite3",
-                    commit_message,
-                    content,
-                    sha_latest_commit,  # Используем SHA последнего коммита
-                    branch=branch
-                )
+        # Проверка, изменилось ли содержимое файла
+        if content != content_latest_commit:
+            # Обновление файла
+            repo.update_file(
+                file_path,
+                commit_message,
+                content,
+                sha_latest_commit,  # Используем SHA последнего коммита
+                branch=branch
+            )
 
-                print(f'Successfully pushed to GitHub at {time.ctime()}')
-            else:
-                print('db.sqlite3 is not an untracked file. Skipping commit and push.')
+            print(f'Successfully pushed to GitHub at {time.ctime()}')
         else:
-            print('No changes in the repository. Skipping commit and push.')
+            print('No changes in the file. Skipping commit and push.')
     except Exception as e:
         print(f'Error: {e}')
 
