@@ -1,5 +1,6 @@
 venv_start:
 			source worker/venv/bin/activate
+			cd worker/
 
 restart_server:
 			sudo systemctl daemon-reload
