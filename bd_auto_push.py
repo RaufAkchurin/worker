@@ -19,26 +19,22 @@ def push_to_github(repo_path, github_token, commit_message):
         sha_latest_commit = repo.get_branch(branch).commit.sha
 
         with open(full_path, 'rb') as file_content:
-            content = file_content.read().decode('utf-8')  # Декодируем содержимое файла
+            content = file_content.read()
 
         # Получение текущего содержимого файла
         file_content_obj = repo.get_contents(file_path, ref=branch)
-        content_latest_commit = file_content_obj.decoded_content.decode('utf-8')
+        sha_current_content = file_content_obj.sha
 
-        # Проверка, изменилось ли содержимое файла
-        if content != content_latest_commit:
-            # Обновление файла
-            repo.update_file(
-                file_path,
-                commit_message,
-                content,
-                sha_latest_commit,  # Используем SHA последнего коммита
-                branch=branch
-            )
+        # Обновление файла с предоставлением sha
+        repo.update_file(
+            file_path,
+            commit_message,
+            content,
+            sha_current_content,  # Используем SHA текущего содержимого файла
+            branch=branch
+        )
 
-            print(f'Successfully pushed to GitHub at {time.ctime()}')
-        else:
-            print('No changes in the file. Skipping commit and push.')
+        print(f'Successfully pushed to GitHub at {time.ctime()}')
     except Exception as e:
         print(f'Error: {e}')
 
