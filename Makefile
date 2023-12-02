@@ -1,3 +1,6 @@
+venv_start:
+			source worker/venv/bin/activate
+
 restart_server:
 			sudo systemctl daemon-reload
 			sudo systemctl stop worker
