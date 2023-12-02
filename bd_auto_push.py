@@ -21,7 +21,7 @@ def push_to_github(repo_path, github_token, commit_message):
         with open(full_path, 'rb') as file_content:
             content = file_content.read()
 
-        # Создание файла с предоставлением sha
+        # Обновление файла с предоставлением sha
         repo.update_file(file_path, commit_message, content, sha, branch=branch)
 
         print(f'Successfully pushed to GitHub at {time.ctime()}')
