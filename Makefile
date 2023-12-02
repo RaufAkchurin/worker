@@ -1,19 +1,10 @@
-clean_migrations:
-			find worker_app/migrations/ -type f ! -name '__init__.py' -exec rm -f {} +
-			rm -rf worker_app/migrations/__pycache__
+restart_server:
+			sudo systemctl daemon-reload
+			sudo systemctl stop worker
+			sudo systemctl start worker
+			systemctl status worker.service
 
-clean_db:
-		 rm -f db.sqlite3
+push_from_server:
+			python3 bd_auto_push.py
 
-create_migrations:
-			./manage.py makemigrations
-			./manage.py migrate
-			./manage.py createsuperuser --username admin
-
-rebuild_db_localhost:
-			make clean_migrations
-			make clean_db
-			make create_migrations
-			./manage.py runserver
-
-.PHONY: clean_migrations clean_db restart_db
+.PHONY: restart_server push_from_server
