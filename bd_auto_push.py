@@ -1,5 +1,4 @@
 import time
-
 from dotenv import load_dotenv
 from github import Github
 import os
@@ -10,12 +9,20 @@ load_dotenv()
 def push_to_github(repo_path, github_token, commit_message):
     try:
         g = Github(github_token)
-        repo = g.get_repo("RaufAkchurin/worker")  # Замените на свой логин и репозиторий
+        repo = g.get_repo("RaufAkchurin/worker")
 
-        with open(os.path.join(repo_path, 'db.sqlite3'), 'rb') as file_content:
+        branch = "master"  # Замените "master" на вашу ветку
+        file_path = "db.sqlite3"
+        full_path = os.path.join(repo_path, file_path)
+
+        # Получение хэша последнего коммита в ветке
+        sha = repo.get_branch(branch).commit.sha
+
+        with open(full_path, 'rb') as file_content:
             content = file_content.read()
 
-        repo.create_file("db.sqlite3", commit_message, content, branch="master")  # Замените "main" на вашу ветку
+        # Создание файла с предоставлением sha
+        repo.update_file(file_path, commit_message, content, sha, branch=branch)
 
         print(f'Successfully pushed to GitHub at {time.ctime()}')
     except Exception as e:
