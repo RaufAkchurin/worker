@@ -2,3 +2,5 @@ devops_info.env
 .env
 *.pyc
 *.out
+*.xlsx
+*.xlsx#
