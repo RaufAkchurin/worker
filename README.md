@@ -84,7 +84,7 @@ WantedBy=multi-user.target
 Таким образом, ваш скрипт будет выполняться ежедневно по заданному расписанию. Убедитесь, что пути к интерпретатору Python (python3) и вашему скрипту (bd_auto_push.py) указаны правильно в команде cron.
 
 
-               НАСТРОЙКА ГУВИКОРНА ЧТОБЫ РАБОТАЛ ЧЕРЕЗ ДОМЕН МНЕСТО АПИ
+               НАСТРОЙКА ГУНИКОРНА ЧТОБЫ РАБОТАЛ ЧЕРЕЗ ДОМЕН МНЕСТО АПИ
 
 создаём /etc/nginx/sites-available/myproject
 
@@ -110,6 +110,10 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
+
+запуск 
+
+`gunicorn -c gunicorn_config.py worker.wsgi:application`
 
                         NGINX
 
