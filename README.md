@@ -111,9 +111,11 @@ server {
     }
 }
 
-запуск 
+    запуск              gunicorn -c gunicorn_config.py worker.wsgi:application
+    остановка           pkill gunicorn
+    поиск               ps aux | grep 'gunicorn'
 
-`gunicorn -c gunicorn_config.py worker.wsgi:application`
+
 
                         NGINX
 
