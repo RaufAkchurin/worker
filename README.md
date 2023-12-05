@@ -92,11 +92,11 @@ WantedBy=multi-user.target
 
 server {
     listen 80;
-    server_name 31.129.103.105 rting-erp.ru;   # наш домен, и айпи адрес сервера где крутится приложение
+    server_name 31.129.103.105 rting-erp.ru;
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /root/worker;
+        alias /root/worker/static/;
     }
 
     location /media/ {
@@ -111,6 +111,7 @@ server {
     }
 }
 
+
     запуск              gunicorn -c gunicorn_config.py worker.wsgi:application
     остановка           pkill gunicorn
     поиск               ps aux | grep 'gunicorn'
@@ -121,7 +122,7 @@ server {
 
 /etc/nginx/nginx.conf
 
-user www-data;
+user root;
 worker_processes auto;
 pid /run/nginx.pid;
 include /etc/nginx/modules-enabled/*.conf;
@@ -182,6 +183,10 @@ http {
 	include /etc/nginx/conf.d/*.conf;
 	include /etc/nginx/sites-enabled/*;
 }
+
+
+                КОМАНДЫ
+    рестарт sudo service nginx restart
 
 
 
