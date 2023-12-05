@@ -190,5 +190,12 @@ http {
 
 
 
+Статьи использовал
+https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-22-04#creating-systemd-socket-and-service-files-for-gunicorn
+
+Решение вопроса со статик файлами (надо добавить рута в конфиге)
+НО конфиг из РИДМИ уже готовый с рутом.
+https://stackoverflow.com/questions/25774999/nginx-stat-failed-13-permission-denied/70142668#70142668
+
 
 
