@@ -45,7 +45,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/root/worker
-ExecStart=/root/worker/venv/bin/python3 /root/worker/manage.py runserver 555.444.666.777:8000(вставить реальный)
+ExecStart=/root/worker/venv/bin/gunicorn -c gunicorn_config.py worker.wsgi:application
 KillMode=process
 Restart=always
 RestartSec=10
@@ -54,6 +54,7 @@ ExecStartPost=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
 
 [Install]
 WantedBy=multi-user.target
+
 
 
 
@@ -92,7 +93,7 @@ WantedBy=multi-user.target
 
 server {
     listen 80;
-    server_name 31.129.103.105 rting-erp.ru;
+    server_name 111.222.333.444 сайт.ru;  
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
