@@ -20,6 +20,14 @@ def get_worker_list():
     return response.json()
 
 
+def get_worker_by_telegram(telegram_id):
+    url = f"{BASE_URL}/worker_by_tg/{telegram_id}"
+    response = requests.get(url=url)
+    if response.status_code == 404:
+        return None
+    else:
+        return response.json()
+
 # сделать доступ по ключу объекты как ниже в категориях(править вьюху)
 
 

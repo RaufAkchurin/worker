@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import test_kb
+from django.telegram.API import get_worker_by_telegram
 from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory
 from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
@@ -30,9 +31,15 @@ dp = Dispatcher()
 
 
 @dp.message(CommandStart())
-async def start(message: Message):
+async def start(message: Message, state: FSMContext):
     id = message.from_user.id
-    await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb)
+
+    if get_worker_by_telegram(message.from_user.id):
+        await state.update_data(user_registered=True)
+        await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb_for_registered)
+    else:
+        await state.update_data(user_registered=False)
+        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb_for_unregistered)
 
 
 @dp.message()
@@ -44,7 +51,7 @@ async def echo(message: Message):
     elif msg == "отпр. отчёт":
         await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
     elif msg == "назад":
-        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
+        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb_for_registered)
 
 
 @dp.callback_query(ObjectCallbackFactory.filter())

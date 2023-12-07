@@ -8,16 +8,23 @@ from aiogram.types import (
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
 
-main_kb = ReplyKeyboardMarkup(
+main_kb_for_registered = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Авторизоваться"),
-            # KeyboardButton(text="Ссылки")
-        ],
-        [
             KeyboardButton(text="Отпр. отчёт"),
-            # KeyboardButton(text="Спец. кнопки")
         ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True,
+    input_field_placeholder="Выберите действие из меню",
+    selective=True
+)
+
+main_kb_for_unregistered = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Пройти регистрацию"),
+        ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
