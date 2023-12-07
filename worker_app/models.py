@@ -6,8 +6,7 @@ from django.db import models
 class Worker(models.Model):
     name = models.CharField(max_length=10, verbose_name='Имя')
     surname = models.CharField(max_length=10, verbose_name='Фамилия')
-    password = models.IntegerField(verbose_name='Пароль')
-    telegram_id = models.CharField(max_length=50, unique=True, verbose_name='Телеграм')
+    telegram_id = models.IntegerField(unique=True, verbose_name='Телеграм_id', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Рабочий'

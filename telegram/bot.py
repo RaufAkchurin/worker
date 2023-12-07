@@ -17,13 +17,9 @@ from dotenv import load_dotenv
 
 # TODO: Добавить проверку пользователя по ТГ-айди в БД
 # TODO: Добавить проверку пароля
-# TODO: Убрать все секретные данные в отдельный файл
-
-
-# Загрузка переменных окружения из файла .env
 load_dotenv()
 
-BOT_LINK = "t.me/stroyka_worker_bot"
+
 HELP_COMMAND = """
 /help - список команд
 /start - начать работу с ботом

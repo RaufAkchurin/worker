@@ -9,6 +9,7 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "surname"
         )
 
 

@@ -61,7 +61,7 @@ class ObjectAdmin(admin.ModelAdmin):
 
 
 class WorkerAdmin(admin.ModelAdmin):
-    list_display = ("name", "surname", "password", "telegram_id",)
+    list_display = ("name", "surname", "telegram_id")
 
 
 class CategoryAdmin(admin.ModelAdmin):

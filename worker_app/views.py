@@ -1,7 +1,7 @@
 from rest_framework import viewsets, generics
 
 from worker_app.models import Category, Worker
-from worker_app.serializers import ObjectSerializer, WorkTypeSerializer
+from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Object
@@ -16,8 +16,25 @@ from .models import Object, WorkType
 
 
 class WorkerListViewSet(viewsets.ModelViewSet):
-    serializer_class = ObjectSerializer
+    serializer_class = WorkerSerializer
     queryset = Worker.objects.all()
+
+
+class WorkerByTelegramIdView(View):
+    serializer_class = WorkerSerializer
+
+    def get(self, request, telegram_id):
+        # Get the object or return a 404 error if not found
+        worker = get_object_or_404(Worker, telegram_id=telegram_id)
+
+        # Serialize the data for JsonResponse
+        worker_data = {
+                'id': worker.pk,
+                'name': worker.name,
+                'surname': worker.surname
+            }
+
+        return JsonResponse({'worker': worker_data})
 
 
 class ObjectListViewSet(viewsets.ModelViewSet):
