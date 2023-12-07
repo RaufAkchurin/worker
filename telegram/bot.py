@@ -35,8 +35,8 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def start(message: Message):
-    user_id = message.from_user.username
-    await message.answer(f"Hello, AIOgram 3.x! Your user ID is {user_id}", reply_markup=test_kb.main_kb)
+    id = message.from_user.id
+    await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb)
 
 
 @dp.message()
@@ -79,7 +79,7 @@ async def process_category_press(callback: CallbackQuery,
 @dp.callback_query(TypeCallbackFactory.filter())
 async def process_type_press(callback: CallbackQuery,
                              callback_data: TypeCallbackFactory,
-                             state: FSMContext
+                             state: FSMContext,
                              ):
     data = await state.get_data()
     selected_type_name = data.get('selected_category_name')
@@ -93,7 +93,8 @@ async def process_type_press(callback: CallbackQuery,
         # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
     await callback.message.answer(
-        text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}"
+        text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}\n" \
+        f"Ваш айди {callback.from_user.id}"
     )
 
 
@@ -103,8 +104,7 @@ async def process_worker_name_press(callback: CallbackQuery,
                                     state: FSMContext):
     await state.set_state(Form.password)
     await callback.message.answer(
-        text=f'Айди рабочего: {callback_data.id}\n' \
-             f'Выбрано имя: {callback_data.name}\n' \
+        text=f'Выбрано имя: {callback_data.name}\n' \
              'Введите пожалуйста пароль',
     )
 
