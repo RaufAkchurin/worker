@@ -63,7 +63,10 @@ async def process_object_press(callback: CallbackQuery,
 
 @dp.callback_query(CategoryCallbackFactory.filter())
 async def process_category_press(callback: CallbackQuery,
-                                 callback_data: CategoryCallbackFactory):
+                                 callback_data: CategoryCallbackFactory,
+                                 state: FSMContext):
+    await state.update_data(selected_category_id=callback_data.id)
+    await state.update_data(selected_category_name=callback_data.name)
     await callback.message.answer(
         text=f'Айди категории: {callback_data.id}\n' \
              f'Название категории: {callback_data.name}\n',
@@ -73,10 +76,16 @@ async def process_category_press(callback: CallbackQuery,
 
 @dp.callback_query(TypeCallbackFactory.filter())
 async def process_type_press(callback: CallbackQuery,
-                                 callback_data: TypeCallbackFactory):
+                             callback_data: TypeCallbackFactory,
+                             state: FSMContext
+                             ):
+    data = await state.get_data()
+    selected_type_id = data.get('selected_category_name')
+
     await callback.message.answer(
         text=f'Айди типа работ: {callback_data.id}\n' \
-             f'Название типа: {callback_data.name}\n',
+             f'Название типа: {callback_data.name}\n' \
+             f'Ранее выбранная категория: {selected_type_id}\n',
         # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
 
@@ -94,7 +103,8 @@ async def process_worker_name_press(callback: CallbackQuery,
 
 
 async def main() -> None:
-    await bot.delete_webhook(drop_pending_updates=True)  # все команды при выключенном боте после включении его не будут обрабатываться
+    await bot.delete_webhook(
+        drop_pending_updates=True)  # все команды при выключенном боте после включении его не будут обрабатываться
     await dp.start_polling(bot)
 
 
