@@ -53,7 +53,9 @@ async def echo(message: Message):
 
 @dp.callback_query(ObjectCallbackFactory.filter())
 async def process_object_press(callback: CallbackQuery,
-                               callback_data: ObjectCallbackFactory):
+                               callback_data: ObjectCallbackFactory,
+                               state: FSMContext):
+    await state.update_data(selected_object_id=callback_data.name)
     await callback.message.answer(
         text=f'Айди объекта: {callback_data.id}\n' \
              f'Название объекта: {callback_data.name}\n',
@@ -80,14 +82,19 @@ async def process_type_press(callback: CallbackQuery,
                              state: FSMContext
                              ):
     data = await state.get_data()
-    selected_type_id = data.get('selected_category_name')
+    selected_type_name = data.get('selected_category_name')
+    selected_object_name = data.get('selected_object_name')
 
     await callback.message.answer(
-        text=f'Айди типа работ: {callback_data.id}\n' \
-             f'Название типа работ: {callback_data.name}\n' \
-             f'тип изм.: {callback_data.measurement}\n' \
-             f'Ранее выбранная категория: {selected_type_id}\n',
+        text=f'Объект: {selected_object_name}\n' \
+             f'Категория: {selected_type_name}\n' \
+             f'Тип работ: {callback_data.name}\n' \
+             f'тип изм.: {callback_data.measurement}\n',
         # reply_markup=TypeInlineKeyboard(callback_data.id)
+    )
+
+    await callback.message.answer(
+        text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}"
     )
 
 

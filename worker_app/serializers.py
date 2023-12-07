@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from worker_app.models import Category, Object, WorkType, Worker
+from worker_app.models import Category, Object, WorkType, Worker, Measurement
 
 
 class WorkerSerializer(serializers.ModelSerializer):
@@ -21,11 +21,26 @@ class ObjectSerializer(serializers.ModelSerializer):
         )
 
 
+class MeasurementSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Measurement
+        fields = (
+            "id",
+            "name",
+        )
+
+
 class WorkTypeSerializer(serializers.ModelSerializer):
+    measurement = MeasurementSerializer(source="measurement_type")
+
     class Meta:
         model = WorkType
         fields = (
             "id",
             "name",
-            "measurement_type",
+            "measurement",
         )
+
+
+

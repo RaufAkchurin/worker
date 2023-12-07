@@ -32,7 +32,6 @@ def get_category_list_by_object_id(object_id):
 def get_work_type_list_by_category_id(category_id):
     url = f"{BASE_URL}/work_types/category/{category_id}/"
     response = requests.get(url=url)
-    print(1)
     return response.json()
 
 
