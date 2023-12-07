@@ -27,4 +27,5 @@ class WorkTypeSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "measurement_type",
         )

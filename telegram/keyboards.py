@@ -54,6 +54,7 @@ def CategoryInlineKeyboard(object_id):
 class TypeCallbackFactory(CallbackData, prefix="type"):
     id: str
     name: str
+    measurement: int
 
 
 def TypeInlineKeyboard(category_id):
@@ -66,7 +67,8 @@ def TypeInlineKeyboard(category_id):
                 text=item["name"],
                 callback_data=TypeCallbackFactory(
                     id=str(item["id"]),
-                    name=item["name"]
+                    name=item["name"],
+                    measurement=item["measurement_type"],
                 ).pack()
             )])
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

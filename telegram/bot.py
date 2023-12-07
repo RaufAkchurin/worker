@@ -84,7 +84,8 @@ async def process_type_press(callback: CallbackQuery,
 
     await callback.message.answer(
         text=f'Айди типа работ: {callback_data.id}\n' \
-             f'Название типа: {callback_data.name}\n' \
+             f'Название типа работ: {callback_data.name}\n' \
+             f'тип изм.: {callback_data.measurement}\n' \
              f'Ранее выбранная категория: {selected_type_id}\n',
         # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
