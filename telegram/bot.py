@@ -55,7 +55,7 @@ async def echo(message: Message):
 async def process_object_press(callback: CallbackQuery,
                                callback_data: ObjectCallbackFactory,
                                state: FSMContext):
-    await state.update_data(selected_object_id=callback_data.name)
+    await state.update_data(selected_object_name=callback_data.name)
     await callback.message.answer(
         text=f'Айди объекта: {callback_data.id}\n' \
              f'Название объекта: {callback_data.name}\n',
@@ -92,7 +92,6 @@ async def process_type_press(callback: CallbackQuery,
              f'тип изм.: {callback_data.measurement}\n',
         # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
-
     await callback.message.answer(
         text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}"
     )
