@@ -9,7 +9,7 @@ from aiogram.types import Message, CallbackQuery
 
 import test_kb
 from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory
+    CategoryCallbackFactory, TypeCallbackFactory
 from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
 from states import Form
 import os
@@ -50,7 +50,7 @@ async def echo(message: Message):
     elif msg == "назад":
         await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
 
-######################################################################################################################
+
 @dp.callback_query(ObjectCallbackFactory.filter())
 async def process_object_press(callback: CallbackQuery,
                                callback_data: ObjectCallbackFactory):
@@ -60,8 +60,6 @@ async def process_object_press(callback: CallbackQuery,
         reply_markup=CategoryInlineKeyboard(callback_data.id)
     )
 
-
-#################################################################3###################################################
 
 @dp.callback_query(CategoryCallbackFactory.filter())
 async def process_category_press(callback: CallbackQuery,
@@ -73,7 +71,14 @@ async def process_category_press(callback: CallbackQuery,
     )
 
 
-#################################################################3###################################################
+@dp.callback_query(TypeCallbackFactory.filter())
+async def process_type_press(callback: CallbackQuery,
+                                 callback_data: TypeCallbackFactory):
+    await callback.message.answer(
+        text=f'Айди типа работ: {callback_data.id}\n' \
+             f'Название типа: {callback_data.name}\n',
+        # reply_markup=TypeInlineKeyboard(callback_data.id)
+    )
 
 
 @dp.callback_query(WorkerCallbackFactory.filter())
@@ -88,35 +93,8 @@ async def process_worker_name_press(callback: CallbackQuery,
     )
 
 
-@dp.message(F.text.lower().in_(["zw", "wz"]))
-async def form_password(message: Message, state: FSMContext):
-    await message.reply("PAAAAAAAAAAAAAAAASSSSSSSSSS")
-    print("HEREEEEEEEEEEEEEEEEEEE")
-
-
-#################################################################3###################################################
-
-# async def login(message: types.Message):
-#     # Запрашиваем пароль у пользователя
-#     await message.answer("Введите пароль:")
-#     # Ожидаем ответ пользователя
-#     response = await bot.wait_for('message')
-#
-#     # Получаем введенный пароль
-#     entered_password = response.text
-#
-#     # Здесь вы можете сравнить введенный пароль с оригиналом
-#     original_password = "your_original_password"
-#
-#     if entered_password == original_password:
-#         await message.answer("Пароль верный, доступ разрешен.")
-#     else:
-#         await message.answer("Неверный пароль, доступ запрещен.")
-
-
 async def main() -> None:
-    await bot.delete_webhook(
-        drop_pending_updates=True)  # все команды при выключенном боте после включении его не будут обрабатываться
+    await bot.delete_webhook(drop_pending_updates=True)  # все команды при выключенном боте после включении его не будут обрабатываться
     await dp.start_polling(bot)
 
 

@@ -28,9 +28,6 @@ def ObjectInlineKeyboard():
     return object_inline_markup
 
 
-######################################################################################
-
-
 class CategoryCallbackFactory(CallbackData, prefix="category"):
     id: str
     name: str
@@ -54,9 +51,6 @@ def CategoryInlineKeyboard(object_id):
     return category_inline_markup
 
 
-######################################################################################
-
-
 class TypeCallbackFactory(CallbackData, prefix="type"):
     id: str
     name: str
@@ -78,8 +72,6 @@ def TypeInlineKeyboard(category_id):
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
 
-
-######################################################################################
 
 def profile_kb(text: str | list):
     builder = ReplyKeyboardBuilder()
