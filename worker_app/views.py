@@ -31,7 +31,8 @@ class WorkerByTelegramIdView(View):
         worker_data = {
                 'id': worker.pk,
                 'name': worker.name,
-                'surname': worker.surname
+                'surname': worker.surname,
+                'telephone': worker.telephone
             }
 
         return JsonResponse({'worker': worker_data})

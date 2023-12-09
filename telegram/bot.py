@@ -3,6 +3,7 @@ import sys
 import asyncio
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
@@ -40,11 +41,9 @@ dp.message.register(register_confirmation, RegisterState.confirmation)
 
 
 @dp.message(CommandStart())
-async def start(message: Message, state: FSMContext):
-    id = message.from_user.id
-
+async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
-        await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb)
+        await message.answer(f"Привет, бот запустился", reply_markup=test_kb.main_kb)
     else:
         await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb)
 
@@ -70,8 +69,7 @@ async def process_object_press(callback: CallbackQuery,
                                state: FSMContext):
     await state.update_data(selected_object_name=callback_data.name)
     await callback.message.answer(
-        text=f'Айди объекта: {callback_data.id}\n' \
-             f'Название объекта: {callback_data.name}\n',
+        text=f'Название объекта: {callback_data.name}\n',
         reply_markup=CategoryInlineKeyboard(callback_data.id)
     )
 
@@ -83,8 +81,7 @@ async def process_category_press(callback: CallbackQuery,
     await state.update_data(selected_category_id=callback_data.id)
     await state.update_data(selected_category_name=callback_data.name)
     await callback.message.answer(
-        text=f'Айди категории: {callback_data.id}\n' \
-             f'Название категории: {callback_data.name}\n',
+        text=f'Название категории: {callback_data.name}\n',
         reply_markup=TypeInlineKeyboard(callback_data.id)
     )
 
@@ -98,17 +95,18 @@ async def process_type_press(callback: CallbackQuery,
     selected_type_name = data.get('selected_category_name')
     selected_object_name = data.get('selected_object_name')
 
+    message_text = (f'<u><b>Объект:</b></u> {selected_object_name}   \n' \
+                     f'<u><b>Категория:</b></u> {selected_type_name} \n' \
+                     f'<u><b>Тип работ:</b></u> {callback_data.name} \n' \
+                     f'<u><b>тип изм.:</b></u> {callback_data.measurement} \n' \
+                     f'                                              \n' \
+                     f"Введите пожалуйста объём выполниненных работ в <u><b>{callback_data.measurement}</b></u>\n"
+                    )
     await callback.message.answer(
-        text=f'Объект: {selected_object_name} \n' \
-             f'Категория: {selected_type_name} \n' \
-             f'Тип работ: {callback_data.name} \n' \
-             f'тип изм.: {callback_data.measurement}\n',
-        # reply_markup=TypeInlineKeyboard(callback_data.id)
+        text=message_text,
+        parse_mode=ParseMode.HTML,
     )
-    await callback.message.answer(
-        text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}\n" \
-             f"Ваш айди {callback.from_user.id}"
-    )
+
 
 
 @dp.callback_query(WorkerCallbackFactory.filter())

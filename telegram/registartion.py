@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
@@ -15,12 +16,16 @@ class RegisterState(StatesGroup):
 async def register_start(message: Message, state: FSMContext):
     worker = get_worker_by_telegram(message.from_user.id)
     if worker:
-        await message.answer('Вы уже зарегистрированы под следующими данными: \n' \
-                             f'Имя: {worker["worker"]["name"]} \n' \
-                             f'Фамилия: {worker["worker"]["surname"]} \n' \
-                             # f'Телефон: {worker["worker"]["surname"]} \n' \
-                             f'Телеграм_айди: {message.from_user.id} \n' \
+        message_text = ('Вы зарегистрированы под следующими данными: \n' \
+                             f'Имя: <u><b>{worker["worker"]["name"]}</b></u> \n' \
+                             f'Фамилия: <u><b>{worker["worker"]["surname"]}</b></u> \n' \
+                             f'Телефон: <u><b>{worker["worker"]["telephone"]}</b></u> \n' \
+                             f'Телеграм_айди: <u><b>{message.from_user.id}</b></u> \n' \
                              )
+        await message.answer(
+            text=message_text,
+            parse_mode=ParseMode.HTML,
+        )
     else:
         await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
         await state.set_state(RegisterState.regName)
