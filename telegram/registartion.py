@@ -2,6 +2,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
+from django.telegram.API import get_worker_by_telegram
+
 
 class RegisterState(StatesGroup):
     regName = State()
@@ -11,8 +13,16 @@ class RegisterState(StatesGroup):
 
 
 async def register_start(message: Message, state: FSMContext):
-    await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
-    await state.set_state(RegisterState.regName)
+    worker = get_worker_by_telegram(message.from_user.id)
+    if worker:
+        await message.answer('Вы уже зарегистрированы под следующими данными:')
+        await message.answer(
+                             f'Имя: {worker["worker"]["name"]} \n' \
+                             f'Фамилия: {worker["worker"]["surname"]} \n' \
+                             )
+    else:
+        await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
+        await state.set_state(RegisterState.regName)
 
 
 async def register_name(message: Message, state: FSMContext):

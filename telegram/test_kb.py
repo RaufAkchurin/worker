@@ -11,8 +11,12 @@ from aiogram.filters.callback_data import CallbackData
 main_kb_for_registered = ReplyKeyboardMarkup(
     keyboard=[
         [
+            KeyboardButton(text="Пройти регистрацию"),
+        ],
+        [
             KeyboardButton(text="Отпр. отчёт"),
         ]
+        #TODO добавить кнопку перезапустить бота который будет вызыватьк оманду старт
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
@@ -20,17 +24,17 @@ main_kb_for_registered = ReplyKeyboardMarkup(
     selective=True
 )
 
-main_kb_for_unregistered = ReplyKeyboardMarkup(
-    keyboard=[
-        [
-            KeyboardButton(text="Пройти регистрацию"),
-        ],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-    input_field_placeholder="Выберите действие из меню",
-    selective=True
-)
+# main_kb_for_unregistered = ReplyKeyboardMarkup(
+#     keyboard=[
+#         [
+#             KeyboardButton(text="Пройти регистрацию"),
+#         ],
+#     ],
+#     resize_keyboard=True,
+#     one_time_keyboard=True,
+#     input_field_placeholder="Выберите действие из меню",
+#     selective=True
+# )
 
 links_kb = InlineKeyboardMarkup(
     inline_keyboard=[

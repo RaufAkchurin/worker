@@ -44,11 +44,9 @@ async def start(message: Message, state: FSMContext):
     id = message.from_user.id
 
     if get_worker_by_telegram(message.from_user.id):
-        await state.update_data(user_registered=True)
         await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb_for_registered)
     else:
-        await state.update_data(user_registered=False)
-        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb_for_unregistered)
+        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb_for_registered)
 
 
 @dp.message()
@@ -61,7 +59,7 @@ async def echo(message: Message):
         if get_worker_by_telegram(message.from_user.id):
             await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
         else:
-            await message.answer("Вы не можете отправлять отчёты, вам необходимо пройти регистрацию.", reply_markup=test_kb.main_kb_for_unregistered)
+            await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "назад":
         await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb_for_registered)
 
