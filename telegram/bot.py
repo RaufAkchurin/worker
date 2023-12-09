@@ -9,7 +9,8 @@ from aiogram.types import Message, CallbackQuery
 
 import test_kb
 from django.telegram.API import get_worker_by_telegram
-from django.telegram.register import RegisterState
+from django.telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
+    register_confirmation
 from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory
 from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
@@ -30,31 +31,12 @@ bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
 
-async def start_register(message: Message, state: FSMContext):
-    await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
-    await state.set_state(RegisterState.regName)
-
-
-async def register_name(message: Message, state: FSMContext):
-    await message.answer(f'Приятно познакомиться {message.text} \n'
-                         f'Теперь укажите номер телефона, чтобы быть на связи \n'
-                         f'Формат телефона: +7xxxxxxxx \n\n'
-                         )
-    await state.update_data(regname=message.text)
-    await state.set_state(RegisterState.regPhone)
-
-
-# обрабатываем ввод телефона
-async def register_phone(message: Message, state: FSMContext):
-    await message.answer("Спасибо за телефон")
-    await state.update_data(regphone=message.text)
-    await state.clear()
-
-
-# Регистрируем хендлеры регистрации
-dp.message.register(start_register, F.text == 'Пройти регистрацию')
+# Регистрируем хендлеры регистрации нового пользователя
+dp.message.register(register_start, F.text == 'Пройти регистрацию')
 dp.message.register(register_name, RegisterState.regName)
+dp.message.register(register_surname, RegisterState.regSurname)
 dp.message.register(register_phone, RegisterState.regPhone)
+dp.message.register(register_confirmation, RegisterState.confirmation)
 
 
 @dp.message(CommandStart())
@@ -72,11 +54,14 @@ async def start(message: Message, state: FSMContext):
 @dp.message()
 async def echo(message: Message):
     msg = message.text.lower()
-
     if msg == "авторизоваться":
         await message.answer("Выберите своё имя:", reply_markup=WorkerInlineKeyboard())
     elif msg == "отпр. отчёт":
-        await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
+        # TODO добавить проверку на наличие телеграм айди
+        if get_worker_by_telegram(message.from_user.id):
+            await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
+        else:
+            await message.answer("Вы не можете отправлять отчёты, вам необходимо пройти регистрацию.", reply_markup=test_kb.main_kb_for_unregistered)
     elif msg == "назад":
         await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb_for_registered)
 
@@ -116,9 +101,9 @@ async def process_type_press(callback: CallbackQuery,
     selected_object_name = data.get('selected_object_name')
 
     await callback.message.answer(
-        text=f'Объект: {selected_object_name}\n' \
-             f'Категория: {selected_type_name}\n' \
-             f'Тип работ: {callback_data.name}\n' \
+        text=f'Объект: {selected_object_name} \n' \
+             f'Категория: {selected_type_name} \n' \
+             f'Тип работ: {callback_data.name} \n' \
              f'тип изм.: {callback_data.measurement}\n',
         # reply_markup=TypeInlineKeyboard(callback_data.id)
     )
