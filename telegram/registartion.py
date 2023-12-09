@@ -15,10 +15,11 @@ class RegisterState(StatesGroup):
 async def register_start(message: Message, state: FSMContext):
     worker = get_worker_by_telegram(message.from_user.id)
     if worker:
-        await message.answer('Вы уже зарегистрированы под следующими данными:')
-        await message.answer(
+        await message.answer('Вы уже зарегистрированы под следующими данными: \n' \
                              f'Имя: {worker["worker"]["name"]} \n' \
                              f'Фамилия: {worker["worker"]["surname"]} \n' \
+                             # f'Телефон: {worker["worker"]["surname"]} \n' \
+                             f'Телеграм_айди: {message.from_user.id} \n' \
                              )
     else:
         await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')

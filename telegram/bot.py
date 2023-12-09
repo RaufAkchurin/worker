@@ -32,7 +32,7 @@ dp = Dispatcher()
 
 
 # Регистрируем хендлеры регистрации нового пользователя
-dp.message.register(register_start, F.text == 'Пройти регистрацию')
+dp.message.register(register_start, F.text == 'Регистрация/Профиль')
 dp.message.register(register_name, RegisterState.regName)
 dp.message.register(register_surname, RegisterState.regSurname)
 dp.message.register(register_phone, RegisterState.regPhone)
@@ -44,9 +44,9 @@ async def start(message: Message, state: FSMContext):
     id = message.from_user.id
 
     if get_worker_by_telegram(message.from_user.id):
-        await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb_for_registered)
+        await message.answer(f"Привет, твой айди - {id}", reply_markup=test_kb.main_kb)
     else:
-        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb_for_registered)
+        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb)
 
 
 @dp.message()
@@ -54,14 +54,14 @@ async def echo(message: Message):
     msg = message.text.lower()
     if msg == "авторизоваться":
         await message.answer("Выберите своё имя:", reply_markup=WorkerInlineKeyboard())
-    elif msg == "отпр. отчёт":
+    elif msg == "отправить отчёт":
         # TODO добавить проверку на наличие телеграм айди
         if get_worker_by_telegram(message.from_user.id):
             await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
         else:
             await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
-    elif msg == "назад":
-        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb_for_registered)
+    elif msg == "перезагрузить бота":
+        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
 
 
 @dp.callback_query(ObjectCallbackFactory.filter())
