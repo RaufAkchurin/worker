@@ -9,6 +9,7 @@ from aiogram.types import Message, CallbackQuery
 
 import test_kb
 from django.telegram.API import get_worker_by_telegram
+from django.telegram.register import RegisterState
 from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory
 from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
@@ -20,7 +21,6 @@ from dotenv import load_dotenv
 # TODO: Добавить проверку пароля
 load_dotenv()
 
-
 HELP_COMMAND = """
 /help - список команд
 /start - начать работу с ботом
@@ -28,6 +28,33 @@ HELP_COMMAND = """
 
 bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
+
+
+async def start_register(message: Message, state: FSMContext):
+    await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
+    await state.set_state(RegisterState.regName)
+
+
+async def register_name(message: Message, state: FSMContext):
+    await message.answer(f'Приятно познакомиться {message.text} \n'
+                         f'Теперь укажите номер телефона, чтобы быть на связи \n'
+                         f'Формат телефона: +7xxxxxxxx \n\n'
+                         )
+    await state.update_data(regname=message.text)
+    await state.set_state(RegisterState.regPhone)
+
+
+# обрабатываем ввод телефона
+async def register_phone(message: Message, state: FSMContext):
+    await message.answer("Спасибо за телефон")
+    await state.update_data(regphone=message.text)
+    await state.clear()
+
+
+# Регистрируем хендлеры регистрации
+dp.message.register(start_register, F.text == 'Пройти регистрацию')
+dp.message.register(register_name, RegisterState.regName)
+dp.message.register(register_phone, RegisterState.regPhone)
 
 
 @dp.message(CommandStart())
@@ -97,7 +124,7 @@ async def process_type_press(callback: CallbackQuery,
     )
     await callback.message.answer(
         text=f"Введите пожалуйста объём выполниненных работ в {callback_data.measurement}\n" \
-        f"Ваш айди {callback.from_user.id}"
+             f"Ваш айди {callback.from_user.id}"
     )
 
 
