@@ -31,6 +31,14 @@ bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
 
+# Регистрируем хендлеры регистрации нового пользователя
+dp.message.register(register_start, F.text == 'Регистрация/Профиль')
+dp.message.register(register_name, RegisterState.regName)
+dp.message.register(register_surname, RegisterState.regSurname)
+dp.message.register(register_phone, RegisterState.regPhone)
+dp.message.register(register_confirmation, RegisterState.confirmation)
+
+
 @dp.message(CommandStart())
 async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
@@ -52,14 +60,6 @@ async def echo(message: Message):
             await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
         await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
-
-
-# Регистрируем хендлеры регистрации нового пользователя
-dp.message.register(register_start, F.text == 'Регистрация/Профиль')
-dp.message.register(register_name, RegisterState.regName)
-dp.message.register(register_surname, RegisterState.regSurname)
-dp.message.register(register_phone, RegisterState.regPhone)
-dp.message.register(register_confirmation, RegisterState.confirmation)
 
 
 @dp.callback_query(ObjectCallbackFactory.filter())
@@ -104,6 +104,17 @@ async def process_type_press(callback: CallbackQuery,
     await callback.message.answer(
         text=message_text,
         parse_mode=ParseMode.HTML,
+    )
+
+
+@dp.callback_query(WorkerCallbackFactory.filter())
+async def process_worker_name_press(callback: CallbackQuery,
+                                    callback_data: WorkerCallbackFactory,
+                                    state: FSMContext):
+    await state.set_state(Form.password)
+    await callback.message.answer(
+        text=f'Выбрано имя: {callback_data.name}\n' \
+             'Введите пожалуйста пароль',
     )
 
 
