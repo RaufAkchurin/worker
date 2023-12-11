@@ -19,8 +19,7 @@ from states import Form
 import os
 from dotenv import load_dotenv
 
-# TODO: Добавить проверку пользователя по ТГ-айди в БД
-# TODO: Добавить проверку пароля
+
 load_dotenv()
 
 HELP_COMMAND = """

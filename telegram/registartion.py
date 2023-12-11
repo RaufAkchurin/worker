@@ -13,40 +13,48 @@ class RegisterState(StatesGroup):
     confirmation = State()
 
 
+async def answer_for_registered_user(message: Message, worker):
+    message_text = ('Вы зарегистрированы под следующими данными: \n' \
+                    f'Имя: <u><b>{worker["worker"]["name"]}</b></u> \n' \
+                    f'Фамилия: <u><b>{worker["worker"]["surname"]}</b></u> \n' \
+                    f'Телефон: <u><b>{worker["worker"]["telephone"]}</b></u> \n' \
+                    f'Телеграм_айди: <u><b>{message.from_user.id}</b></u> \n' \
+                    )
+    await message.answer(
+        text=message_text,
+        parse_mode=ParseMode.HTML,
+    )
+
+
 async def register_start(message: Message, state: FSMContext):
     worker = get_worker_by_telegram(message.from_user.id)
     if worker:
-        message_text = ('Вы зарегистрированы под следующими данными: \n' \
-                             f'Имя: <u><b>{worker["worker"]["name"]}</b></u> \n' \
-                             f'Фамилия: <u><b>{worker["worker"]["surname"]}</b></u> \n' \
-                             f'Телефон: <u><b>{worker["worker"]["telephone"]}</b></u> \n' \
-                             f'Телеграм_айди: <u><b>{message.from_user.id}</b></u> \n' \
-                             )
-        await message.answer(
-            text=message_text,
-            parse_mode=ParseMode.HTML,
-        )
+        await answer_for_registered_user(message=message, worker=worker)
     else:
         await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
         await state.set_state(RegisterState.regName)
 
 
 async def register_name(message: Message, state: FSMContext):
-    #TODO добавить валидацию чтобы были только буквы, и чтобы не слишком длинно было
-    await message.answer(f'Приятно познакомиться {message.text} \n'
-                         f"Введите вашу фамилию"
-                         )
-    await state.update_data(regname=message.text)
-    await state.set_state(RegisterState.regSurname)
+    if message.text.isalpha() and len(message.text) <= 12:
+        await state.update_data(regname=message.text)
+        await state.set_state(RegisterState.regSurname)
+        await message.answer(f'⭐ Приятно познакомиться {message.text.capitalize()} ⭐\n '
+                             f"Введите пожалуйста вашу фамилию"
+                             )
+    else:
+        await message.answer("⚠️Имя должно содержать только буквы, и длина не должна превышать 12 символов⚠️")
 
 
 async def register_surname(message: Message, state: FSMContext):
-    # TODO добавить валидацию чтобы были только буквы, и чтобы не слишком длинно было
-    await message.answer(f'Ваша фамилия {message.text} \n'
-                         f'Теперь укажите номер телефона, чтобы быть на связи \n'
-                         )
-    await state.update_data(regsurname=message.text)
-    await state.set_state(RegisterState.regPhone)
+    if message.text.isalpha() and len(message.text) <= 12:
+        await message.answer(f'⭐ Ваша фамилия {message.text.capitalize()}⭐ \n '
+                             f'☎️ Теперь укажите номер телефона, который доступен для связи.\n'
+                             )
+        await state.update_data(regsurname=message.text)
+        await state.set_state(RegisterState.regPhone)
+    else:
+        await message.answer("⚠️ Фамилия должна содержать только буквы, и длина не должна превышать 12 символов⚠️")
 
 
 async def register_phone(message: Message, state: FSMContext):
@@ -78,10 +86,6 @@ async def register_confirmation(message: Message, state: FSMContext):
                                  'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
         else:
             await message.answer('⚠️Что то пошло не так, попробуйте снова, или обратитесь к разработчику⚠️')
-
-
-        #TODO добавить логику отправки запроса на ендпоинт при 200 статусе
-        #TODO добавить логику отправки запроса на ендпоинт при ошибках
 
     elif message.text == "нет":
         await state.set_state(RegisterState.regName)
