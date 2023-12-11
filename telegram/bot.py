@@ -108,7 +108,6 @@ async def process_type_press(callback: CallbackQuery,
     )
 
 
-
 @dp.callback_query(WorkerCallbackFactory.filter())
 async def process_worker_name_press(callback: CallbackQuery,
                                     callback_data: WorkerCallbackFactory,

@@ -28,6 +28,22 @@ def get_worker_by_telegram(telegram_id):
     else:
         return response.json()
 
+
+def post_worker_registration(name, surname, telephone, telegram_id):
+    url = f"{BASE_URL}/worker_registration"
+    data = {
+        "name": name,
+        "surname": surname,
+        "telephone": telephone,
+        "telegram_id": telegram_id
+    }
+    response = requests.post(url, data)
+    if response.status_code == 201:
+        return True
+    else:
+        return False
+
+
 # сделать доступ по ключу объекты как ниже в категориях(править вьюху)
 
 

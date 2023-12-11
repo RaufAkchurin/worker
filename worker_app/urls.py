@@ -3,12 +3,13 @@ from django.urls import path
 from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
-    WorkerListViewSet, WorkerByTelegramIdView
+    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView
 
 urlpatterns = [
     # WORKERS
     path("workers", WorkerListViewSet.as_view({'get': 'list', }), name="workers", ),
     path("worker_by_tg/<int:telegram_id>", WorkerByTelegramIdView.as_view(), name="worker_by_tg", ),
+    path("worker_registration", WorkerRegistrationView.as_view(), name="worker_registration"),
 
     #  OBJECTS
     path("objects", ObjectListViewSet.as_view({'get': 'list', }), name="objects", ),

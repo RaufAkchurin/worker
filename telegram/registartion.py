@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
-from django.telegram.API import get_worker_by_telegram
+from django.telegram.API import get_worker_by_telegram, post_worker_registration
 
 
 class RegisterState(StatesGroup):
@@ -51,23 +51,35 @@ async def register_surname(message: Message, state: FSMContext):
 
 async def register_phone(message: Message, state: FSMContext):
     # TODO добавить валидацию
-    data = await state.get_data()
-    regname = data.get('regname')
-    regsurname = data.get('regsurname')
+    data_from_state = await state.get_data()
+    regname = data_from_state.get('regname')
+    regsurname = data_from_state.get('regsurname')
 
     await message.answer(   f'Проверьте ваши данные: \n' \
                             f'Имя: {regname} \n' \
                             f'Фамилия: {regsurname} \n' \
                             f'Телефон: {message.text} \n' \
                             "Всё верно?(да/нет)")
-    await state.update_data(regphone=message.text)
+    await state.update_data(regtelephone=message.text)
     await state.set_state(RegisterState.confirmation)
 
 
 async def register_confirmation(message: Message, state: FSMContext):
+    data_from_state = await state.get_data()
+    name = data_from_state.get('regname')
+    surname = data_from_state.get('regsurname')
+    telephone = data_from_state.get('regtelephone')
+    telegram_id = message.from_user.id
+
     if message.text == "да":
-        await message.answer('Регистрация прошла успешно 🆗\n' \
-                            'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
+        response = post_worker_registration(name=name, surname=surname, telephone=telephone, telegram_id=telegram_id)
+        if response:
+            await message.answer('Регистрация прошла успешно 🆗\n' \
+                                 'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
+        else:
+            await message.answer('⚠️Что то пошло не так, попробуйте снова, или обратитесь к разработчику⚠️')
+
+
         #TODO добавить логику отправки запроса на ендпоинт при 200 статусе
         #TODO добавить логику отправки запроса на ендпоинт при ошибках
 

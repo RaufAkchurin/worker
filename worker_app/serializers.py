@@ -13,6 +13,19 @@ class WorkerSerializer(serializers.ModelSerializer):
         )
 
 
+class WorkerRegistrationSerializer(serializers.ModelSerializer):
+    telegram_id = serializers.IntegerField(required=True)
+
+    class Meta:
+        model = Worker
+        fields = (
+            "name",
+            "surname",
+            "telephone",
+            "telegram_id"
+        )
+
+
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Object

@@ -10,6 +10,8 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views import View
 from .models import Object, WorkType
+from .serializers import WorkerRegistrationSerializer
+
 
 #TODO для смены - если вводится тип-работ и дата  на которые уже есть запись -
 # спросить хочет ли он перезаписать и просто изменять данные
@@ -36,6 +38,15 @@ class WorkerByTelegramIdView(View):
             }
 
         return JsonResponse({'worker': worker_data})
+
+
+class WorkerRegistrationView(APIView):
+    def post(self, request):
+        serializer = WorkerRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ObjectListViewSet(viewsets.ModelViewSet):
