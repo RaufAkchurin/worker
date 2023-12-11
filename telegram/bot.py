@@ -12,13 +12,12 @@ import test_kb
 from django.telegram.API import get_worker_by_telegram
 from django.telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
+from django.telegram.report import ReportState, report_value_input, report_confirmation
 from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory
-from workers_kb import WorkerInlineKeyboard, WorkerCallbackFactory
-from states import Form
+from workers_kb import WorkerInlineKeyboard
 import os
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -30,13 +29,16 @@ HELP_COMMAND = """
 bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
-
 # Регистрируем хендлеры регистрации нового пользователя
 dp.message.register(register_start, F.text == 'Регистрация/Профиль')
 dp.message.register(register_name, RegisterState.regName)
 dp.message.register(register_surname, RegisterState.regSurname)
 dp.message.register(register_phone, RegisterState.regPhone)
 dp.message.register(register_confirmation, RegisterState.confirmation)
+
+# Регистрируем хендлеры отчётов
+dp.message.register(report_value_input, ReportState.value)
+dp.message.register(report_confirmation, ReportState.confirmation)
 
 
 @dp.message(CommandStart())
@@ -90,32 +92,20 @@ async def process_type_press(callback: CallbackQuery,
                              callback_data: TypeCallbackFactory,
                              state: FSMContext,
                              ):
-    data = await state.get_data()
-    selected_type_name = data.get('selected_category_name')
-    selected_object_name = data.get('selected_object_name')
 
-    message_text = (f'<u><b>Объект:</b></u> {selected_object_name}   \n' \
-                     f'<u><b>Категория:</b></u> {selected_type_name} \n' \
-                     f'<u><b>Тип работ:</b></u> {callback_data.name} \n' \
-                     f'<u><b>тип изм.:</b></u> {callback_data.measurement} \n' \
-                     f'                                              \n' \
-                     f"Введите пожалуйста объём выполниненных работ в <u><b>{callback_data.measurement}</b></u>\n"
+    await state.update_data(selected_type_id=callback_data.id)  # Для пост запроса на создание смены
+    await state.update_data(selected_type_name=callback_data.name)
+    await state.update_data(selected_type_measurement=callback_data.measurement)
+
+    message_text = (f'Тип работ: {callback_data.name} \n' \
+                    f'                                              \n' \
+                    f"Введите пожалуйста объём выполниненных работ в <u><b>{callback_data.measurement}</b></u>\n"
                     )
     await callback.message.answer(
         text=message_text,
         parse_mode=ParseMode.HTML,
     )
-
-
-@dp.callback_query(WorkerCallbackFactory.filter())
-async def process_worker_name_press(callback: CallbackQuery,
-                                    callback_data: WorkerCallbackFactory,
-                                    state: FSMContext):
-    await state.set_state(Form.password)
-    await callback.message.answer(
-        text=f'Выбрано имя: {callback_data.name}\n' \
-             'Введите пожалуйста пароль',
-    )
+    await state.set_state(ReportState.value)
 
 
 async def main() -> None:

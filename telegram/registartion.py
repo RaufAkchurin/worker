@@ -5,6 +5,10 @@ from aiogram.types import Message
 
 from django.telegram.API import get_worker_by_telegram, post_worker_registration
 
+#TODO добавить очищение стейта
+#TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
+#TODO добавить валидацию номера телефона
+
 
 class RegisterState(StatesGroup):
     regName = State()
