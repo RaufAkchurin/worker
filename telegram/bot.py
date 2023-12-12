@@ -8,7 +8,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-import test_kb
+import bot_kb
 from django.telegram.API import get_worker_by_telegram
 from django.telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
@@ -45,9 +45,9 @@ async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
         await message.answer(f"Привет, бот запустился \n" \
                              "Перезапустить бота - /start"
-                             , reply_markup=test_kb.main_kb)
+                             , reply_markup=bot_kb.main_kb)
     else:
-        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb)
+        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=bot_kb.main_kb)
 
 
 @dp.message()
@@ -59,7 +59,7 @@ async def echo(message: Message):
         else:
             await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
-        await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
+        await message.answer("Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
 
 
 @dp.callback_query(DateCallbackFactory.filter())

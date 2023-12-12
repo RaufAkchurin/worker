@@ -6,7 +6,6 @@ from aiogram.types import Message
 from django.telegram.API import get_worker_by_telegram, post_worker_registration
 
 #TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
-#TODO добавить валидацию номера телефона
 
 
 class RegisterState(StatesGroup):
@@ -52,7 +51,8 @@ async def register_name(message: Message, state: FSMContext):
 async def register_surname(message: Message, state: FSMContext):
     if message.text.isalpha() and len(message.text) <= 12:
         await message.answer(f'⭐ Ваша фамилия {message.text.capitalize()}⭐ \n '
-                             f'☎️ Теперь укажите номер телефона, который доступен для связи.\n'
+                             f' Теперь укажите номер телефона, который доступен для связи.\n'
+                             f'☎️ Формат номер такой 89172839062\n'
                              )
         await state.update_data(regsurname=message.text)
         await state.set_state(RegisterState.regPhone)
@@ -66,13 +66,16 @@ async def register_phone(message: Message, state: FSMContext):
     regname = data_from_state.get('regname')
     regsurname = data_from_state.get('regsurname')
 
-    await message.answer(   f'Проверьте ваши данные: \n' \
-                            f'Имя: {regname} \n' \
-                            f'Фамилия: {regsurname} \n' \
-                            f'Телефон: {message.text} \n' \
-                            "Всё верно?(да/нет)")
-    await state.update_data(regtelephone=message.text)
-    await state.set_state(RegisterState.confirmation)
+    if message.text.isdigit() and len(message.text) == 11:
+        await message.answer(   f'Проверьте ваши данные: \n' \
+                                f'Имя: {regname} \n' \
+                                f'Фамилия: {regsurname} \n' \
+                                f'Телефон: {message.text} \n' \
+                                "Всё верно?(да/нет)")
+        await state.update_data(regtelephone=message.text)
+        await state.set_state(RegisterState.confirmation)
+    else:
+        await message.answer("Номер указан в неправильном формате")
 
 
 async def register_confirmation(message: Message, state: FSMContext):
@@ -87,11 +90,14 @@ async def register_confirmation(message: Message, state: FSMContext):
         if response:
             await message.answer('Регистрация прошла успешно 🆗\n' \
                                  'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
+            await state.clear()  # Очищаем стейт только если прошло положительно иначе - чтобы запускалось занова
         else:
             await message.answer('⚠️Что то пошло не так, попробуйте снова, или обратитесь к разработчику⚠️')
 
     elif message.text == "нет":
+        await state.clear()
         await state.set_state(RegisterState.regName)
         await message.answer("Введите ваше имя занова")
 
-    await state.clear()  # Очищаем стейт в любом случае
+    else:
+        await message.answer("⚠️ Ответить можно только да или нет⚠️")
