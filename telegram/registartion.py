@@ -5,7 +5,6 @@ from aiogram.types import Message
 
 from django.telegram.API import get_worker_by_telegram, post_worker_registration
 
-#TODO добавить очищение стейта
 #TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
 #TODO добавить валидацию номера телефона
 
@@ -94,3 +93,5 @@ async def register_confirmation(message: Message, state: FSMContext):
     elif message.text == "нет":
         await state.set_state(RegisterState.regName)
         await message.answer("Введите ваше имя занова")
+
+    await state.clear()  # Очищаем стейт в любом случае

@@ -28,8 +28,6 @@ HELP_COMMAND = """
 bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
-#TODO ПОсле регистрации нового пользователя необходимо перезапускать бота, пофиксить
-
 # Регистрируем хендлеры регистрации нового пользователя
 dp.message.register(register_start, F.text == 'Регистрация/Профиль')
 dp.message.register(register_name, RegisterState.regName)
@@ -45,7 +43,9 @@ dp.message.register(report_confirmation, ReportState.confirmation)
 @dp.message(CommandStart())
 async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
-        await message.answer(f"Привет, бот запустился", reply_markup=test_kb.main_kb)
+        await message.answer(f"Привет, бот запустился \n" \
+                             "Перезапустить бота - /start"
+                             , reply_markup=test_kb.main_kb)
     else:
         await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=test_kb.main_kb)
 
@@ -54,8 +54,7 @@ async def start(message: Message):
 async def echo(message: Message):
     msg = message.text.lower()
     if msg == "отправить отчёт":
-        # TODO добавить проверку на наличие телеграм айди
-        if get_worker_by_telegram(message.from_user.id):
+        if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
             await message.answer("Выберите дату для отчёта:", reply_markup=DateInlineKeyboard())
         else:
             await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")

@@ -7,7 +7,6 @@ from django.telegram.API import post_shift_creation, get_worker_by_telegram
 from django.telegram.report_kb import DateInlineKeyboard
 
 
-# TODO добавить очищение стейта
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
 
 

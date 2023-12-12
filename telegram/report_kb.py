@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
-    get_work_type_list_by_category_id, get_worker_list
+    get_work_type_list_by_category_id
 from datetime import datetime, timedelta
 
 
