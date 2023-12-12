@@ -14,7 +14,7 @@ from django.telegram.registartion import RegisterState, register_start, register
     register_confirmation
 from django.telegram.report import ReportState, report_value_input, report_confirmation
 from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory, TypeCallbackFactory
+    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard
 import os
 from dotenv import load_dotenv
 
@@ -54,11 +54,23 @@ async def echo(message: Message):
     if msg == "отправить отчёт":
         # TODO добавить проверку на наличие телеграм айди
         if get_worker_by_telegram(message.from_user.id):
-            await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
+            await message.answer("Выберите дату для отчёта:", reply_markup=DateInlineKeyboard())
         else:
             await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
         await message.answer("Вы перешли в главное меню!", reply_markup=test_kb.main_kb)
+
+
+@dp.callback_query(DateCallbackFactory.filter())
+async def process_data_press(callback: CallbackQuery,
+                               callback_data: DateCallbackFactory,
+                               state: FSMContext):
+    await state.update_data(selected_date=callback_data.date)
+    await callback.message.answer(
+        text=f'Дата: {callback_data.date}\n'\
+             f'Выберите объект',
+        reply_markup=ObjectInlineKeyboard()
+    )
 
 
 @dp.callback_query(ObjectCallbackFactory.filter())

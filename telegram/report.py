@@ -48,7 +48,7 @@ async def report_value_input(message: Message, state: FSMContext):
 
 async def report_confirmation(message: Message, state: FSMContext):
     if message.text == "да":
-        await message.answer("Вы выбрали да", reply_markup=DateInlineKeyboard())
+        await message.answer("Вы выбрали да")
     elif message.text == "нет":
         await message.answer("Вы выбрали нет")
     else:
