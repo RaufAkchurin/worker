@@ -28,6 +28,8 @@ HELP_COMMAND = """
 bot = Bot(os.getenv('TELEGRAM_BOT_TOKEN'))
 dp = Dispatcher()
 
+#TODO ПОсле регистрации нового пользователя необходимо перезапускать бота, пофиксить
+
 # Регистрируем хендлеры регистрации нового пользователя
 dp.message.register(register_start, F.text == 'Регистрация/Профиль')
 dp.message.register(register_name, RegisterState.regName)
