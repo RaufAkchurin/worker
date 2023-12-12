@@ -3,6 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
+from django.telegram.report_kb import DateInlineKeyboard
+
 
 # TODO добавить очищение стейта
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
@@ -46,7 +48,7 @@ async def report_value_input(message: Message, state: FSMContext):
 
 async def report_confirmation(message: Message, state: FSMContext):
     if message.text == "да":
-        await message.answer("Вы выбрали да")
+        await message.answer("Вы выбрали да", reply_markup=DateInlineKeyboard())
     elif message.text == "нет":
         await message.answer("Вы выбрали нет")
     else:

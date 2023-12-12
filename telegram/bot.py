@@ -13,9 +13,8 @@ from django.telegram.API import get_worker_by_telegram
 from django.telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
 from django.telegram.report import ReportState, report_value_input, report_confirmation
-from keyboards import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
+from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory
-from workers_kb import WorkerInlineKeyboard
 import os
 from dotenv import load_dotenv
 
@@ -52,9 +51,7 @@ async def start(message: Message):
 @dp.message()
 async def echo(message: Message):
     msg = message.text.lower()
-    if msg == "авторизоваться":
-        await message.answer("Выберите своё имя:", reply_markup=WorkerInlineKeyboard())
-    elif msg == "отправить отчёт":
+    if msg == "отправить отчёт":
         # TODO добавить проверку на наличие телеграм айди
         if get_worker_by_telegram(message.from_user.id):
             await message.answer("Выберите объект на котором вы работали:", reply_markup=ObjectInlineKeyboard())
