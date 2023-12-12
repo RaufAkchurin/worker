@@ -3,7 +3,7 @@ from django.urls import path
 from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
-    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView
+    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView
 
 urlpatterns = [
     # WORKERS
@@ -22,5 +22,8 @@ urlpatterns = [
     #  REPORTS
     path('report_customer/<int:object_id>/', ReportCustomerView.as_view(), name='report_customer'),
     path('report_worker/<int:object_id>/', ReportWorkerView.as_view(), name='report_worker'),
+
+    # SHIFT
+    path("shift_creation", ShiftCreationView.as_view(), name="shift_creation"),
 
 ]

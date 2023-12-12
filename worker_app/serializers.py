@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from worker_app.models import Category, Object, WorkType, Worker, Measurement
+from worker_app.models import Category, Object, WorkType, Worker, Measurement, Shift
 
 
 class WorkerSerializer(serializers.ModelSerializer):
@@ -54,6 +54,17 @@ class WorkTypeSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "measurement",
+        )
+
+
+class ShiftCreationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shift
+        fields = (
+            "worker",
+            "date",
+            "work_type",
+            "value",
         )
 
 

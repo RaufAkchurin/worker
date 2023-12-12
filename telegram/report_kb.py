@@ -92,8 +92,7 @@ class DateCallbackFactory(CallbackData, prefix="date"):
 def date_buttons_text_generator():
     current_date = datetime.now().date()
     last_15_days = [current_date - timedelta(days=i) for i in range(14, -1, -1)]
-    formatted_dates = [date.strftime("%d.%m.%Y") for date in last_15_days]
-    return formatted_dates
+    return last_15_days
 
 
 def DateInlineKeyboard():
@@ -105,7 +104,7 @@ def DateInlineKeyboard():
     for item in items:
         # Создаем кнопку
         button = InlineKeyboardButton(
-            text=str(item),
+            text=str(item.strftime("%d.%m.%Y")),
             callback_data=DateCallbackFactory(
                 date=str(item),
             ).pack()

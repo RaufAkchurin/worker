@@ -61,3 +61,18 @@ def get_work_type_list_by_object_id(object_id):
     response = requests.get(url=url)
     return response.json()["work_types"]
 
+
+async def post_shift_creation(worker_id, date, work_type_id, value):
+    url = f"{BASE_URL}/shift_creation"
+    data = {
+        "worker": worker_id,
+        "date": date,
+        "work_type": work_type_id,
+        "value": value
+    }
+    response = requests.post(url, data)
+    if response.status_code == 201:
+        return True
+    else:
+        return False
+

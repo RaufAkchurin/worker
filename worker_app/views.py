@@ -4,16 +4,15 @@ from worker_app.models import Category, Worker
 from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer
 from rest_framework.views import APIView
 from rest_framework import status
-from .models import Object
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views import View
 from .models import Object, WorkType
-from .serializers import WorkerRegistrationSerializer
+from .serializers import WorkerRegistrationSerializer, ShiftCreationSerializer
 
 
-#TODO для смены - если вводится тип-работ и дата  на которые уже есть запись -
+# TODO для смены - если вводится тип-работ и дата  на которые уже есть запись -
 # спросить хочет ли он перезаписать и просто изменять данные
 
 
@@ -31,11 +30,11 @@ class WorkerByTelegramIdView(View):
 
         # Serialize the data for JsonResponse
         worker_data = {
-                'id': worker.pk,
-                'name': worker.name,
-                'surname': worker.surname,
-                'telephone': worker.telephone
-            }
+            'id': worker.pk,
+            'name': worker.name,
+            'surname': worker.surname,
+            'telephone': worker.telephone
+        }
 
         return JsonResponse({'worker': worker_data})
 
@@ -102,3 +101,12 @@ class WorkTypeListByCategory(generics.ListAPIView):
     def get_queryset(self):
         category_id = self.kwargs['category_id']
         return WorkType.objects.filter(category__id=category_id)
+
+
+class ShiftCreationView(APIView):
+    def post(self, request):
+        serializer = ShiftCreationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
