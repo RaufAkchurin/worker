@@ -9,10 +9,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 import bot_kb
-from django.telegram.API import get_worker_by_telegram
-from django.telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
+from telegram.API import get_worker_by_telegram
+from telegram.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
-from django.telegram.report import ReportState, report_value_input, report_confirmation
+from telegram.report import ReportState, report_value_input, report_confirmation
 from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
     CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard
 import os

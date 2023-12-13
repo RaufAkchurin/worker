@@ -3,8 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
-from django.telegram.API import post_shift_creation, get_worker_by_telegram
-from django.telegram.report_kb import DateInlineKeyboard
+from telegram.API import post_shift_creation, get_worker_by_telegram
+from telegram.report_kb import DateInlineKeyboard
 
 
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
