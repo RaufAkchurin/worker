@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
-from telegram.API import get_worker_by_telegram, post_worker_registration
+from API import get_worker_by_telegram, post_worker_registration
 
 #TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
 
