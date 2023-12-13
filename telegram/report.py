@@ -1,3 +1,4 @@
+from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -15,7 +16,8 @@ class ReportState(StatesGroup):
     confirmation = State()
 
 
-async def message_to_confirmation(message: Message, state: FSMContext):  # ЭТО ПРОСТО СООБЩЕНИЕ БЕЗ ВСЯКОЙ ЛОГИКИ
+async def message_to_confirmation(message: Message, state: FSMContext,
+                                  bot: Bot):  # ЭТО ПРОСТО СООБЩЕНИЕ БЕЗ ВСЯКОЙ ЛОГИКИ
     data = await state.get_data()
     selected_date = data.get('selected_date')
     selected_object = data.get('selected_object_name')
@@ -33,43 +35,44 @@ async def message_to_confirmation(message: Message, state: FSMContext):  # ЭТ�
                     "Подтверждаете введённые данные? (да/нет)"
                     )
 
-    await message.answer(
-        text=message_text,
-        parse_mode=ParseMode.HTML,
-    )
+    await bot.send_message(message.from_user.id, text=message_text,
+                           parse_mode=ParseMode.HTML,
+                           )
 
 
-async def report_value_input(message: Message, state: FSMContext):
+async def report_value_input(message: Message, state: FSMContext, bot: Bot):
     if message.text.isdigit():
         await state.update_data(report_value=message.text)
-        await message_to_confirmation(message, state)
+        await message_to_confirmation(message, state, bot)
         await state.set_state(ReportState.confirmation)
     else:
-        await message.answer("⚠️ Введите пожалуйста число⚠️ ")
+        await bot.send_message(message.from_user.id, text="⚠️ Введите пожалуйста число⚠️ ")
 
 
-async def shift_creation(message: Message, state: FSMContext):
+async def shift_creation(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     worker_id = get_worker_by_telegram(message.from_user.id)["worker"]["id"]
     date = data.get('selected_date')
     work_type_id = data.get('selected_type_id')
     value = data.get('report_value')
     response = await post_shift_creation(date=date, worker_id=worker_id, work_type_id=work_type_id, value=value,
-                                         message=message)
+                                         bot=bot)
     return response
 
 
-async def report_confirmation(message: Message, state: FSMContext):
+async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
     if message.text == "да":
-        result = await shift_creation(message=message, state=state)
+        result = await shift_creation(message=message, state=state, bot=bot)
         if result:
-            await message.answer("🏆Отчёт успешно добавлен🏆")
+            await bot.send_message(message.from_user.id, text="🏆Отчёт успешно добавлен🏆")
         else:
-            await message.answer("😕Отчёт не прошёл, повторите пожалуйста занова😕", reply_markup=DateInlineKeyboard())
+            await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
+                                   reply_markup=DateInlineKeyboard())
         await state.clear()
 
     elif message.text == "нет":
         await state.clear()
-        await message.answer("Выберите дату для отчёта занова:", reply_markup=DateInlineKeyboard())
+        await bot.send_message(message.from_user.id, text="Выберите дату для отчёта занова:",
+                               reply_markup=DateInlineKeyboard())
     else:
-        await message.answer("⚠️ Ответить можно только да или нет⚠️")
+        await bot.send_message(message.from_user.id, text="⚠️ Ответить можно только да или нет⚠️")

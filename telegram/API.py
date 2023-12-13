@@ -1,6 +1,7 @@
 import os
 
 import requests
+from aiogram import Bot
 from aiogram.types import Message
 from dotenv import load_dotenv
 
@@ -63,7 +64,7 @@ def get_work_type_list_by_object_id(object_id):
     return response.json()["work_types"]
 
 
-async def post_shift_creation(worker_id, date, work_type_id, value, message: Message):
+async def post_shift_creation(worker_id, date, work_type_id, value, bot: Bot):
     url = f"{BASE_URL}/shift_creation"
     data = {
         "worker": worker_id,
@@ -78,7 +79,7 @@ async def post_shift_creation(worker_id, date, work_type_id, value, message: Mes
         if response.json().get("non_field_errors") == [
         "The fields work_type, date, worker must make a unique set."
     ]:
-            await message.answer("Вы уже подали отчёт с такой датой на данный тип работ")
+            await bot.send_message(message.from_user.id, text="Вы уже подали отчёт с такой датой на данный тип работ")
 
     else:
         return False

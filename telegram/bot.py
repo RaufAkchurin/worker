@@ -43,11 +43,11 @@ dp.message.register(report_confirmation, ReportState.confirmation)
 @dp.message(CommandStart())
 async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
-        await message.answer(f"Привет, бот запустился \n" \
+        await bot.send_message(message.from_user.id, text=f"Привет, бот запустился \n" \
                              "Перезапустить бота - /start"
                              , reply_markup=bot_kb.main_kb)
     else:
-        await message.answer("Пожалуйста пройдите регистрацию.", reply_markup=bot_kb.main_kb)
+        await bot.send_message(message.from_user.id, text="Пожалуйста пройдите регистрацию.", reply_markup=bot_kb.main_kb)
 
 
 @dp.message()
@@ -55,11 +55,11 @@ async def echo(message: Message):
     msg = message.text.lower()
     if msg == "отправить отчёт":
         if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
-            await message.answer("Выберите дату для отчёта:", reply_markup=DateInlineKeyboard())
+            await bot.send_message(message.from_user.id, text="Выберите дату для отчёта:", reply_markup=DateInlineKeyboard())
         else:
-            await message.answer("⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
+            await bot.send_message(message.from_user.id, text="⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
-        await message.answer("Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
+        await bot.send_message(message.from_user.id, text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
 
 
 @dp.callback_query(DateCallbackFactory.filter())
@@ -67,7 +67,7 @@ async def process_data_press(callback: CallbackQuery,
                                callback_data: DateCallbackFactory,
                                state: FSMContext):
     await state.update_data(selected_date=callback_data.date)
-    await callback.message.answer(
+    await callback.bot.send_message(callback.message.chat.id,
         text=f'Дата: {callback_data.date}\n'\
              f'Выберите объект',
         reply_markup=ObjectInlineKeyboard()
@@ -79,7 +79,7 @@ async def process_object_press(callback: CallbackQuery,
                                callback_data: ObjectCallbackFactory,
                                state: FSMContext):
     await state.update_data(selected_object_name=callback_data.name)
-    await callback.message.answer(
+    await callback.bot.send_message(callback.message.chat.id,
         text=f'Название объекта: {callback_data.name}\n',
         reply_markup=CategoryInlineKeyboard(callback_data.id)
     )
@@ -91,7 +91,7 @@ async def process_category_press(callback: CallbackQuery,
                                  state: FSMContext):
     await state.update_data(selected_category_id=callback_data.id)
     await state.update_data(selected_category_name=callback_data.name)
-    await callback.message.answer(
+    await callback.bot.send_message(callback.message.chat.id,
         text=f'Название категории: {callback_data.name}\n',
         reply_markup=TypeInlineKeyboard(callback_data.id)
     )
@@ -111,7 +111,7 @@ async def process_type_press(callback: CallbackQuery,
                     f'                                              \n' \
                     f"Введите пожалуйста объём выполниненных работ в <u><b>{callback_data.measurement}</b></u>\n"
                     )
-    await callback.message.answer(
+    await callback.bot.send_message(callback.message.chat.id,
         text=message_text,
         parse_mode=ParseMode.HTML,
     )
