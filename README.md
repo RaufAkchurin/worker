@@ -31,16 +31,37 @@
 
         НАСТРОЙКА systemctl (автоматический перезапуск в случае падения)
 
-**Создайте файл службы:**
-sudo nano /etc/systemd/system/worker.service
+**Создайте  2 файла службы(для джанго и для бота отдельно):**
+sudo nano /etc/systemd/system/django_app.service
+sudo nano /etc/systemd/system/bot_app.service
 
 
-**Добавьте следующую конфигурацию в файл службы:**
-
-
+**Добавьте следующие конфигурациюи в файлы службы:**
 [Unit]
-Description=Django and Bot
+Description=Aiogram bot
 After=network.target
+Requires=django_app.service
+PartOf=django_app.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/worker
+ExecStart=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
+KillMode=process
+Restart=always
+RestartSec=10
+EnvironmentFile=/root/worker/.env
+
+[Install]
+WantedBy=multi-user.target
+
+
+№2
+[Unit]
+Description=Django
+After=network.target
+Requires=django_app.service
+PartOf=aiogram_app.service
 
 [Service]
 Type=simple
@@ -50,7 +71,6 @@ KillMode=process
 Restart=always
 RestartSec=10
 EnvironmentFile=/root/worker/.env
-ExecStartPost=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
 
 [Install]
 WantedBy=multi-user.target
@@ -58,10 +78,14 @@ WantedBy=multi-user.target
 
 
 
+
+
             **ПОСЛЕ ПАРВОК В КОНФИГЕ**
 **sudo systemctl daemon-reload**
-**sudo systemctl start worker**
-статус проверять вот так **systemctl status worker.service**
+**sudo systemctl start worker_app**
+**sudo systemctl start aiogram_app**
+статус проверять вот так **systemctl status worker_app.service**
+статус проверять вот так **systemctl status django_app.service**
 
 
       АВТОМАТИЧЕСКИЙ ПУШИНГ БАЗЫ НА ГИТХАБ НАСТРОЙКА
