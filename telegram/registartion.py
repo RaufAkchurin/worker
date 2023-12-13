@@ -24,6 +24,7 @@ async def answer_for_registered_user(message: Message, worker, bot: Bot):
                     f'Телеграм_айди: <u><b>{message.from_user.id}</b></u> \n' \
                     )
     await bot.send_message(
+        message.from_user.id,
         text=message_text,
         parse_mode=ParseMode.HTML,
     )
@@ -32,7 +33,7 @@ async def answer_for_registered_user(message: Message, worker, bot: Bot):
 async def register_start(message: Message, state: FSMContext, bot: Bot):
     worker = get_worker_by_telegram(message.from_user.id)
     if worker:
-        await answer_for_registered_user(message=message, worker=worker)
+        await answer_for_registered_user(message=message, worker=worker, bot=bot)
     else:
         await bot.send_message(message.from_user.id, text=f'📝 Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? 📝')
         await state.set_state(RegisterState.regName)
