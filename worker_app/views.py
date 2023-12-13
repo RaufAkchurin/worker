@@ -12,10 +12,6 @@ from .models import Object, WorkType
 from .serializers import WorkerRegistrationSerializer, ShiftCreationSerializer
 
 
-# TODO для смены - если вводится тип-работ и дата  на которые уже есть запись -
-# спросить хочет ли он перезаписать и просто изменять данные
-
-
 class WorkerListViewSet(viewsets.ModelViewSet):
     serializer_class = WorkerSerializer
     queryset = Worker.objects.all()

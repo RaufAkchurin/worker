@@ -16,7 +16,7 @@ class RegisterState(StatesGroup):
 
 
 async def answer_for_registered_user(message: Message, worker):
-    message_text = ('Вы зарегистрированы под следующими данными: \n' \
+    message_text = ('👷 Вы зарегистрированы под следующими данными: \n' \
                     f'Имя: <u><b>{worker["worker"]["name"]}</b></u> \n' \
                     f'Фамилия: <u><b>{worker["worker"]["surname"]}</b></u> \n' \
                     f'Телефон: <u><b>{worker["worker"]["telephone"]}</b></u> \n' \
@@ -33,7 +33,7 @@ async def register_start(message: Message, state: FSMContext):
     if worker:
         await answer_for_registered_user(message=message, worker=worker)
     else:
-        await message.answer(f'⭐ Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? ⭐')
+        await message.answer(f'📝 Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? 📝')
         await state.set_state(RegisterState.regName)
 
 
@@ -41,7 +41,7 @@ async def register_name(message: Message, state: FSMContext):
     if message.text.isalpha() and len(message.text) <= 12:
         await state.update_data(regname=message.text)
         await state.set_state(RegisterState.regSurname)
-        await message.answer(f'⭐ Приятно познакомиться {message.text.capitalize()} ⭐\n '
+        await message.answer(f'🤝 Приятно познакомиться {message.text.capitalize()} 🤝\n '
                              f"Введите пожалуйста вашу фамилию"
                              )
     else:
@@ -51,8 +51,9 @@ async def register_name(message: Message, state: FSMContext):
 async def register_surname(message: Message, state: FSMContext):
     if message.text.isalpha() and len(message.text) <= 12:
         await message.answer(f'⭐ Ваша фамилия {message.text.capitalize()}⭐ \n '
-                             f' Теперь укажите номер телефона, который доступен для связи.\n'
-                             f'☎️ Формат номер такой 89172839062\n'
+                             f'📱 Теперь укажите номер телефона, который доступен для связи.\n'
+                             f'                                                             \n'
+                             f'⚠️ Формат телефона: 89172839062\n'
                              )
         await state.update_data(regsurname=message.text)
         await state.set_state(RegisterState.regPhone)
@@ -75,7 +76,7 @@ async def register_phone(message: Message, state: FSMContext):
         await state.update_data(regtelephone=message.text)
         await state.set_state(RegisterState.confirmation)
     else:
-        await message.answer("Номер указан в неправильном формате")
+        await message.answer("⚠️Номер указан в неправильном формате⚠️")
 
 
 async def register_confirmation(message: Message, state: FSMContext):

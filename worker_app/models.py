@@ -75,6 +75,7 @@ class Shift(models.Model):
     class Meta:
         verbose_name = 'Результат за день'
         verbose_name_plural = 'Результаты за день'
+        unique_together = ['work_type', 'date', 'worker']
 
     def __str__(self):
         return f"{self.worker.name} -- {self.work_type} -- {self.date}"
