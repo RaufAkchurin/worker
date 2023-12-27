@@ -12,104 +12,36 @@
 -на серваке LOCALHOST_IP в .env указываем АЙПИ сервера
 -на локальном компе указываем 127.0.0.1:8000
 
-5) В settings.py проверяем наличие обоих АЙПИ **ALLOWED_HOSTS = ['АЙПИ СЕРВЕРА', '127.0.0.1']**
+5) В settings.py проверяем наличие обоих АЙПИ **ALLOWED_HOSTS = ['rting-erp.ru', 'айпи сервера', '127.0.0.1']**
+
+5.1) копируем gunicorn_config.py в папку с manage.py
+
+5.2) копируем passanger_wsgi.py в папку с manage.py
 
 6) Запускаем джангу вот так 
 **nohup python3 manage.py runserver 555.444.666.777:8000**
 те при запуске надо указать настоящий айпи сервера
 
-7) После закрытия терминала процесс будет жить, чтобы его найти в 
+После закрытия терминала процесс будет жить, чтобы его найти в 
 дальнейшем можно воспользоваться
 **`ps aux | grep 'python3'`**
+
+или так после настройки гуникорна
+
+gunicorn -c gunicorn_config.py trip_admin.wsgi:application
+gunicorn trip_admin.wsgi:application
 
    8) чтобы завершить принудительно процесс, используй
    **`kill -9 PID`**
    Замените PID на фактический идентификатор процесса.
 
-         _НАСТРОЙКА АВТОМАТИЧЕСКОГО РЕСТАРТА В СЛУЧАЕ ПАДЕНИЯ_
 
 
-        НАСТРОЙКА systemctl (автоматический перезапуск в случае падения)
+НАСТРОЙКА ГУНИКОРНА ЧТОБЫ РАБОТАЛ ЧЕРЕЗ ДОМЕН МНЕСТО АПИ
 
-**Создайте  2 файла службы(для джанго и для бота отдельно):**
-sudo nano /etc/systemd/system/django_app.service
-sudo nano /etc/systemd/system/bot_app.service
+sudo apt update
+sudo apt install nginx
 
-
-**Добавьте следующие конфигурациюи в файлы службы:**
-[Unit]
-Description=Aiogram bot
-After=network.target
-Requires=django_app.service
-PartOf=django_app.service
-
-[Service]
-Type=simple
-WorkingDirectory=/root/worker
-ExecStart=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
-KillMode=process
-Restart=always
-RestartSec=10
-EnvironmentFile=/root/worker/.env
-
-[Install]
-WantedBy=multi-user.target
-
-
-№2
-[Unit]
-Description=Django
-After=network.target
-Requires=django_app.service
-PartOf=aiogram_app.service
-
-[Service]
-Type=simple
-WorkingDirectory=/root/worker
-ExecStart=/root/worker/venv/bin/gunicorn -c gunicorn_config.py worker.wsgi:application
-KillMode=process
-Restart=always
-RestartSec=10
-EnvironmentFile=/root/worker/.env
-
-[Install]
-WantedBy=multi-user.target
-
-
-
-
-
-
-            **ПОСЛЕ ПАРВОК В КОНФИГЕ**
-**sudo systemctl daemon-reload**
-**sudo systemctl start worker_app**
-**sudo systemctl start aiogram_app**
-статус проверять вот так **systemctl status worker_app.service**
-статус проверять вот так **systemctl status django_app.service**
-
-
-      АВТОМАТИЧЕСКИЙ ПУШИНГ БАЗЫ НА ГИТХАБ НАСТРОЙКА
-
-1) в .енв добавить токен от гитхаба
-2) Для того чтобы скрипт выполнялся раз в день автоматически, вы можете использовать планировщик задач в операционной системе. Например, для Unix-подобных систем (Linux, macOS) это может быть cron.
-
-Вот пример того, как вы можете настроить cron-задачу:
-
-Откройте терминал.
-
-Введите команду:
-
-`crontab -e`
-В редакторе cron-задач добавьте строку, которая будет запускать ваш скрипт раз в день. Например:
-
-`0 13 * * * /root/worker/venv/bin/python3 /root/worker/bd_auto_push.py`
-Эта строка означает, что скрипт будет запускаться каждый день в (13 часов, 0 минут). Вы можете изменить время запуска, используя другие значения.
-
-Сохраните изменения и закройте редактор.
-Таким образом, ваш скрипт будет выполняться ежедневно по заданному расписанию. Убедитесь, что пути к интерпретатору Python (python3) и вашему скрипту (bd_auto_push.py) указаны правильно в команде cron.
-
-
-               НАСТРОЙКА ГУНИКОРНА ЧТОБЫ РАБОТАЛ ЧЕРЕЗ ДОМЕН МНЕСТО АПИ
 
 создаём /etc/nginx/sites-available/myproject
 
@@ -210,8 +142,99 @@ http {
 }
 
 
-                КОМАНДЫ
-    рестарт sudo service nginx restart
+                КОМАНДЫ ОБЪЯЗАТЕЛЬНО ОБЕ ПОСЛЕ ВСЕХ НАСТРОЕК НГИНС И ГУНИКОРНА!!!
+Чтобы сайт начал работать, Вам нужно настроить симлинк на файл /etc/nginx/sites-available/myproject из папки /etc/nginx/sites-enabled/:
+ 1) ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled/
+ 2) рестарт sudo service nginx restart
+ 
+
+    
+
+
+         _НАСТРОЙКА АВТОМАТИЧЕСКОГО РЕСТАРТА В СЛУЧАЕ ПАДЕНИЯ_
+
+
+        НАСТРОЙКА systemctl (автоматический перезапуск в случае падения)
+
+**Создайте  2 файла службы(для джанго и для бота отдельно):**
+sudo nano /etc/systemd/system/django_app.service
+sudo nano /etc/systemd/system/bot_app.service
+
+
+**Добавьте следующие конфигурациюи в файлы службы:**
+[Unit]
+Description=Aiogram bot
+After=network.target
+Requires=django_app.service
+PartOf=django_app.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/worker
+ExecStart=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
+KillMode=process
+Restart=always
+RestartSec=10
+EnvironmentFile=/root/worker/.env
+
+[Install]
+WantedBy=multi-user.target
+
+
+№2
+[Unit]
+Description=Django
+After=network.target
+Requires=django_app.service
+PartOf=aiogram_app.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/worker
+ExecStart=/root/worker/venv/bin/gunicorn -c gunicorn_config.py worker.wsgi:application
+KillMode=process
+Restart=always
+RestartSec=10
+EnvironmentFile=/root/worker/.env
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
+
+            **ПОСЛЕ ПАРВОК В КОНФИГЕ**
+**sudo systemctl daemon-reload**
+**sudo systemctl start worker_app**
+**sudo systemctl start aiogram_app**
+статус проверять вот так **systemctl status worker_app.service**
+статус проверять вот так **systemctl status django_app.service**
+
+
+      АВТОМАТИЧЕСКИЙ ПУШИНГ БАЗЫ НА ГИТХАБ НАСТРОЙКА
+
+1) в .енв добавить токен от гитхаба
+2) Для того чтобы скрипт выполнялся раз в день автоматически, вы можете использовать планировщик задач в операционной системе. Например, для Unix-подобных систем (Linux, macOS) это может быть cron.
+
+Вот пример того, как вы можете настроить cron-задачу:
+
+Откройте терминал.
+
+Введите команду:
+
+`crontab -e`
+В редакторе cron-задач добавьте строку, которая будет запускать ваш скрипт раз в день. Например:
+
+`0 13 * * * /root/worker/venv/bin/python3 /root/worker/bd_auto_push.py`
+Эта строка означает, что скрипт будет запускаться каждый день в (13 часов, 0 минут). Вы можете изменить время запуска, используя другие значения.
+
+Сохраните изменения и закройте редактор.
+Таким образом, ваш скрипт будет выполняться ежедневно по заданному расписанию. Убедитесь, что пути к интерпретатору Python (python3) и вашему скрипту (bd_auto_push.py) указаны правильно в команде cron.
+
+
+               
 
 
 
