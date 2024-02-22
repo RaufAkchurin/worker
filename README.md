@@ -207,7 +207,7 @@ WantedBy=multi-user.target
 
             **ПОСЛЕ ПАРВОК В КОНФИГЕ**
 **sudo systemctl daemon-reload**
-**sudo systemctl start worker_app**
+**sudo systemctl start django_app**
 **sudo systemctl start aiogram_app**
 статус проверять вот так **systemctl status worker_app.service**
 статус проверять вот так **systemctl status django_app.service**

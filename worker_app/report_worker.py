@@ -110,9 +110,21 @@ class ReportWorkerView(View):
 
             columns_travel = ['Рабочий', 'дней', 'к оплате', 'выплачено', 'остаток']
 
-            # Записываем заголовки в файл для командировок
+            # Заголовок КОМАНДИРОВОЧНЫЕ
+            row_num += 4
+            travels_row = worksheet.cell(row=row_num, column=1, value='Командировочные')
+            travels_row.font = Font(bold=True, )
+            worksheet.merge_cells(start_row=row_num,
+                                  start_column=1,
+                                  end_row=row_num,
+                                  end_column=5)  # Объединяем ячейки на 5 колонок
+            # Center-align the text in the merged cells
+            travels_row.alignment = Alignment(horizontal='center', vertical='center')
+            orange_fill = PatternFill(start_color='FFA500', end_color='FFA500', fill_type='solid')
+            travels_row.fill = orange_fill
 
-            row_num += 5
+            # Записываем заголовки в файл для командировок
+            row_num += 1
             for col_num, column_title in enumerate(columns_travel, 1):
                 cell = worksheet.cell(row=row_num, column=col_num)
                 cell.value = column_title
@@ -140,7 +152,7 @@ class ReportWorkerView(View):
                                value=days_in_travel * travel.rate)  # Total for the month
                 worksheet.cell(row=row_num, column=4,
                                value=TravelBenefits.objects.filter(travel=travel).aggregate(Sum('paid_for_travel'))[
-                                   'paid_for_travel__sum'] or 0)  # Paid
+                                         'paid_for_travel__sum'] or 0)  # Paid
 
                 # Remaining balance
                 remaining_balance = (days_in_travel * travel.rate) - (
