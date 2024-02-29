@@ -206,11 +206,16 @@ WantedBy=multi-user.target
 
 
             **ПОСЛЕ ПАРВОК В КОНФИГЕ**
-**sudo systemctl daemon-reload**
-**sudo systemctl start django_app**
-**sudo systemctl start aiogram_app**
-статус проверять вот так **systemctl status worker_app.service**
-статус проверять вот так **systemctl status django_app.service**
+sudo systemctl daemon-reload
+
+sudo systemctl start django_app
+sudo systemctl start aiogram_app
+
+sudo systemctl stop django_app
+sudo systemctl stop aiogram_app
+
+статус проверять вот так systemctl status worker_app.service
+статус проверять вот так systemctl status django_app.service
 
 
       АВТОМАТИЧЕСКИЙ ПУШИНГ БАЗЫ НА ГИТХАБ НАСТРОЙКА
