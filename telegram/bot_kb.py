@@ -20,3 +20,21 @@ main_kb = ReplyKeyboardMarkup(
     input_field_placeholder="Выберите действие из меню",
     selective=True
 )
+
+yes_or_no_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="Да"),
+        ],
+        [
+            KeyboardButton(text="Нет"),
+        ],
+        [
+            KeyboardButton(text="Перезагрузить бота"),
+        ]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False,
+    input_field_placeholder="Выберите действие из меню",
+    selective=True
+)
