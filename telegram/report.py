@@ -37,9 +37,11 @@ async def message_to_confirmation(message: Message, state: FSMContext,
                     "Подтверждаете введённые данные? (да/нет)"
                     )
 
-    await bot.send_message(message.from_user.id, text=message_text,
-                           parse_mode=ParseMode.HTML,
-                           )
+    await bot.send_message(
+        message.from_user.id, text=message_text,
+        parse_mode=ParseMode.HTML,
+        reply_markup=bot_kb.yes_or_no_kb
+    )
 
 
 async def report_value_input(message: Message, state: FSMContext, bot: Bot):
@@ -72,7 +74,10 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
             await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
                                    reply_markup=DateInlineKeyboard())
 
-        await bot.send_message(message.from_user.id, text="Желаете добавить еще работы по данному объекту?", reply_markup=bot_kb.yes_or_no_kb)
+        # confirmation to continue adding report
+
+        await bot.send_message(message.from_user.id, text="Желаете добавить еще работы по данному объекту?",
+                               reply_markup=bot_kb.yes_or_no_kb)
         if message.text == "да":
             await state.set_state(ReportState.adding_continue)
         else:

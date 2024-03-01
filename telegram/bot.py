@@ -2,7 +2,7 @@ import logging
 import sys
 import asyncio
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
@@ -44,10 +44,11 @@ dp.message.register(report_confirmation, ReportState.confirmation)
 async def start(message: Message):
     if get_worker_by_telegram(message.from_user.id):
         await bot.send_message(message.from_user.id, text=f"Привет, бот запустился \n" \
-                             "Перезапустить бота - /start"
-                             , reply_markup=bot_kb.main_kb)
+                                                          "Перезапустить бота - /start"
+                               , reply_markup=bot_kb.main_kb)
     else:
-        await bot.send_message(message.from_user.id, text="Пожалуйста пройдите регистрацию.", reply_markup=bot_kb.main_kb)
+        await bot.send_message(message.from_user.id, text="Пожалуйста пройдите регистрацию.",
+                               reply_markup=bot_kb.main_kb)
 
 
 @dp.message()
@@ -55,46 +56,36 @@ async def echo(message: Message):
     msg = message.text.lower()
     if msg == "отправить отчёт":
         if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
-            await bot.send_message(message.from_user.id, text="Выберите дату для отчёта:", reply_markup=DateInlineKeyboard())
+            await bot.send_message(message.from_user.id, text="Выберите дату для отчёта:",
+                                   reply_markup=DateInlineKeyboard())
         else:
-            await bot.send_message(message.from_user.id, text="⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
+            await bot.send_message(message.from_user.id,
+                                   text="⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
         await bot.send_message(message.from_user.id, text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
 
 
 @dp.callback_query(DateCallbackFactory.filter())
 async def process_data_press(callback: CallbackQuery,
-                               callback_data: DateCallbackFactory,
-                               state: FSMContext):
+                             callback_data: DateCallbackFactory,
+                             state: FSMContext):
     await state.update_data(selected_date=callback_data.date)
     await callback.bot.send_message(callback.message.chat.id,
-        text=f'Дата: {callback_data.date}\n'\
-             f'Выберите объект',
-        reply_markup=ObjectInlineKeyboard()
-    )
+                                    text=f'Дата: {callback_data.date}\n' \
+                                         f'Выберите объект',
+                                    reply_markup=ObjectInlineKeyboard()
+                                    )
 
 
-@dp.callback_query(ObjectCallbackFactory.filter())
+@dp.callback_query(ObjectCallbackFactory.filter())  # this for continue adding
 async def process_object_press(callback: CallbackQuery,
                                callback_data: ObjectCallbackFactory,
                                state: FSMContext):
     await state.update_data(selected_object_name=callback_data.name)
     await callback.bot.send_message(callback.message.chat.id,
-        text=f'Название объекта: {callback_data.name}\n',
-        reply_markup=CategoryInlineKeyboard(callback_data.id)
-    )
-
-
-@dp.callback_query(CategoryCallbackFactory.filter())
-async def process_category_press(callback: CallbackQuery,
-                                 callback_data: CategoryCallbackFactory,
-                                 state: FSMContext):
-    await state.update_data(selected_category_id=callback_data.id)
-    await state.update_data(selected_category_name=callback_data.name)
-    await callback.bot.send_message(callback.message.chat.id,
-        text=f'Название категории: {callback_data.name}\n',
-        reply_markup=TypeInlineKeyboard(callback_data.id)
-    )
+                                    text=f'Название объекта: {callback_data.name}\n',
+                                    reply_markup=CategoryInlineKeyboard(callback_data.id)
+                                    )
 
 
 @dp.callback_query(TypeCallbackFactory.filter())
@@ -102,7 +93,6 @@ async def process_type_press(callback: CallbackQuery,
                              callback_data: TypeCallbackFactory,
                              state: FSMContext,
                              ):
-
     await state.update_data(selected_type_id=callback_data.id)  # Для пост запроса на создание смены
     await state.update_data(selected_type_name=callback_data.name)
     await state.update_data(selected_type_measurement=callback_data.measurement)
@@ -112,9 +102,9 @@ async def process_type_press(callback: CallbackQuery,
                     f"Введите пожалуйста объём выполниненных работ в <u><b>{callback_data.measurement}</b></u>\n"
                     )
     await callback.bot.send_message(callback.message.chat.id,
-        text=message_text,
-        parse_mode=ParseMode.HTML,
-    )
+                                    text=message_text,
+                                    parse_mode=ParseMode.HTML,
+                                    )
     await state.set_state(ReportState.value)
 
 
