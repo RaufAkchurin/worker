@@ -24,10 +24,10 @@ main_kb = ReplyKeyboardMarkup(
 yes_or_no_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="да"),
+            KeyboardButton(text="Да"),
         ],
         [
-            KeyboardButton(text="нет"),
+            KeyboardButton(text="Нет"),
         ],
         [
             KeyboardButton(text="Перезагрузить бота"),
