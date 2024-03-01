@@ -6,7 +6,6 @@ from aiogram.types import Message
 
 from API import post_shift_creation, get_worker_by_telegram
 from report_kb import DateInlineKeyboard
-from telegram import bot_kb
 
 
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
@@ -14,7 +13,6 @@ from telegram import bot_kb
 
 class ReportState(StatesGroup):
     value = State()
-    adding_continue = State()
     confirmation = State()
 
 
@@ -67,19 +65,10 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
         result = await shift_creation(message=message, state=state, bot=bot)
         if result:
             await bot.send_message(message.from_user.id, text="🏆Отчёт успешно добавлен🏆")
-
         else:
             await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
                                    reply_markup=DateInlineKeyboard())
-
-        await bot.send_message(message.from_user.id, text="Желаете добавить еще работы по данному объекту?", reply_markup=bot_kb.yes_or_no_kb)
-        if message.text == "да":
-            await state.set_state(ReportState.adding_continue)
-        else:
-            await state.clear()
-            await bot.send_message(message.from_user.id, text="Спасибо за отчёт!")
-
-
+        await state.clear()
 
     elif message.text == "нет":
         await state.clear()
