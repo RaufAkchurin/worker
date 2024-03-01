@@ -6,6 +6,7 @@ from aiogram.types import Message
 
 from API import post_shift_creation, get_worker_by_telegram
 from report_kb import DateInlineKeyboard
+from telegram import bot_kb
 
 
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
@@ -13,6 +14,7 @@ from report_kb import DateInlineKeyboard
 
 class ReportState(StatesGroup):
     value = State()
+    adding_continue = State()
     confirmation = State()
 
 
@@ -35,9 +37,11 @@ async def message_to_confirmation(message: Message, state: FSMContext,
                     "Подтверждаете введённые данные? (да/нет)"
                     )
 
-    await bot.send_message(message.from_user.id, text=message_text,
-                           parse_mode=ParseMode.HTML,
-                           )
+    await bot.send_message(
+        message.from_user.id, text=message_text,
+        parse_mode=ParseMode.HTML,
+        reply_markup=bot_kb.yes_or_no_kb
+    )
 
 
 async def report_value_input(message: Message, state: FSMContext, bot: Bot):
@@ -55,7 +59,11 @@ async def shift_creation(message: Message, state: FSMContext, bot: Bot):
     date = data.get('selected_date')
     work_type_id = data.get('selected_type_id')
     value = data.get('report_value')
-    response = await post_shift_creation(date=date, worker_id=worker_id, work_type_id=work_type_id, value=value,
+    response = await post_shift_creation(date=date,
+                                         worker_id=worker_id,
+                                         worker_tg=message.from_user.id,
+                                         work_type_id=work_type_id,
+                                         value=value,
                                          bot=bot)
     return response
 
@@ -65,10 +73,21 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
         result = await shift_creation(message=message, state=state, bot=bot)
         if result:
             await bot.send_message(message.from_user.id, text="🏆Отчёт успешно добавлен🏆")
+
         else:
-            await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
-                                   reply_markup=DateInlineKeyboard())
-        await state.clear()
+            await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕")
+
+        # confirmation to continue adding report
+
+        # await bot.send_message(message.from_user.id, text="Желаете добавить еще работы по данному объекту?",
+        #                        reply_markup=bot_kb.yes_or_no_kb)
+        # if message.text == "да":
+        #     await state.set_state(ReportState.adding_continue)
+        # else:
+        #     await state.clear()
+        #     await bot.send_message(message.from_user.id, text="Спасибо за отчёт!")
+
+
 
     elif message.text == "нет":
         await state.clear()

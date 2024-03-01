@@ -64,7 +64,7 @@ def get_work_type_list_by_object_id(object_id):
     return response.json()["work_types"]
 
 
-async def post_shift_creation(worker_id, date, work_type_id, value, bot: Bot):
+async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, bot: Bot):
     url = f"{BASE_URL}/shift_creation"
     data = {
         "worker": worker_id,
@@ -77,10 +77,9 @@ async def post_shift_creation(worker_id, date, work_type_id, value, bot: Bot):
         return True
     elif response.status_code == 400:
         if response.json().get("non_field_errors") == [
-        "The fields work_type, date, worker must make a unique set."
-    ]:
-            await bot.send_message(message.from_user.id, text="Вы уже подали отчёт с такой датой на данный тип работ")
+            "The fields work_type, date, worker must make a unique set."
+        ]:
+            await bot.send_message(worker_tg, text="⚠️Вы уже подали отчёт с такой датой на данный тип работ⚠️")
 
     else:
         return False
-
