@@ -1,6 +1,6 @@
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
     get_work_type_list_by_category_id
@@ -74,6 +74,21 @@ def TypeInlineKeyboard(category_id):
             )])
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
+
+
+class Pagination(CallbackData, prefix="pag"):
+    action: str
+    page: int
+
+
+def paginator(page: int = 0):
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        InlineKeyboardButton(text="⬅️", callback_data=Pagination(action="prev", page=page).pack()),
+        InlineKeyboardButton(text="▶️", callback_data=Pagination(action="next", page=page).pack()),
+        width=2
+    )
+    return builder.as_markup()
 
 
 def profile_kb(text: str | list):
