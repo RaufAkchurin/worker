@@ -72,10 +72,17 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
     if message.text == "да":
         result = await shift_creation(message=message, state=state, bot=bot)
         if result:
-            await bot.send_message(message.from_user.id, text="🏆Отчёт успешно добавлен🏆")
+            await bot.send_message(message.from_user.id,
+                                   text="🏆Отчёт успешно добавлен🏆",
+                                   reply_markup=bot_kb.main_kb
+                                   )
 
         else:
-            await bot.send_message(message.from_user.id, text="😕Отчёт не прошёл, повторите пожалуйста занова😕")
+            await bot.send_message(message.from_user.id,
+                                   text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
+                                   reply_markup=bot_kb.main_kb
+                                   )
+        await state.clear()
 
         # confirmation to continue adding report
 

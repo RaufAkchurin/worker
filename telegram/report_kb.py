@@ -59,7 +59,7 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
 
 
 def TypeInlineKeyboard(category_id):
-    items = get_work_type_list_by_category_id(category_id)
+    items = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
     inline_keyboard = []
 
     for item in items:
