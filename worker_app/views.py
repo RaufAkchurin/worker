@@ -114,8 +114,7 @@ class CategoryListView(APIView):
             # Получаем уникальные категории с айди и названием
             unique_categories = categories.values('id', 'name').distinct()
             # Преобразуем каждую категорию в словарь
-            categories_list = [{'id': category['id'], 'name': category['name']} for category in
-                               unique_categories]
+            categories_list = [{'id': category['id'], 'name': category['name']} for category in unique_categories]
             return Response({'categories': categories_list})
         except Object.DoesNotExist:
             return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)

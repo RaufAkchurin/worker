@@ -94,11 +94,16 @@ async def echo(message: Message):
 
 @dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
 async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
+    #TODO  продумать логику, определение какую именно клавиатуру надо сгенерировать
+    #TODO и соответстсвенно тогда мы можем и текст адекватный подставлять
     if callback_data.action:
         await query.message.edit_text(
             text="Выберите нужный вариант",
             reply_markup=TypeInlineKeyboard(url=callback_data.url, category_id=None)
         )
+
+        # 'pagination:api/v1/work_types/category/19/?page=2:next'  types
+        # 'pagination:api/v1/objects?page=2:next'   objects
 
 
 @dp.callback_query(DateCallbackFactory.filter())
