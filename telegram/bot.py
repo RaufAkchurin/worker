@@ -15,7 +15,8 @@ from registartion import RegisterState, register_start, register_name, register_
     register_confirmation
 from report import ReportState, report_value_input, report_confirmation
 from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard, paginator, Pagination
+    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard, paginator, Pagination, \
+    PaginationCallbackFactory
 import os
 from dotenv import load_dotenv
 from aiogram.exceptions import TelegramBadRequest
@@ -89,6 +90,15 @@ async def echo(message: Message):
         await bot.send_message(message.from_user.id, text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
     elif msg == "смайлики":
         await message.answer(f"{smiles[0][0]} - <b>{smiles[0][1]}</b>", reply_markup=paginator())
+
+
+# @dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
+# async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
+#     if callback_data.action == "next":
+#         await query.message.edit_text(
+#             f"{smiles[page][0]} - <b>{smiles[page][1]}</b>",
+#             reply_markup=paginator(page)
+#         )
 
 
 @dp.callback_query(DateCallbackFactory.filter())

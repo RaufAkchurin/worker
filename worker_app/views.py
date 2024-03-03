@@ -1,4 +1,5 @@
 from rest_framework import viewsets, generics
+from rest_framework.pagination import PageNumberPagination
 
 from worker_app.models import Category, Worker
 from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer
@@ -91,12 +92,43 @@ class WorkTypesByObjectView(View):
         return JsonResponse({'work_types': work_types_data})
 
 
+class CustomPageNumberPagination(PageNumberPagination):
+    def get_paginated_response(self, data):
+        next_url = self.get_next_link()
+        prev_url = self.get_previous_link()
+
+        # Cut base URL
+        base_url = self.request.build_absolute_uri('/')
+        next_url_cut = next_url.replace(base_url, '') if next_url else None
+        prev_url_cut = prev_url.replace(base_url, '') if prev_url else None
+
+        return Response({
+            'count': self.page.paginator.count,
+            'next': next_url_cut,
+            'previous': prev_url_cut,
+            'results': data
+        })
+
+
 class WorkTypeListByCategory(generics.ListAPIView):
     serializer_class = WorkTypeSerializer
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 10
 
     def get_queryset(self):
         category_id = self.kwargs['category_id']
         return WorkType.objects.filter(category__id=category_id)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ShiftCreationView(APIView):

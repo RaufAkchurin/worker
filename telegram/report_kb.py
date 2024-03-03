@@ -58,11 +58,16 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
     measurement: str
 
 
-def TypeInlineKeyboard(category_id):
-    items = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
+class PaginationCallbackFactory(CallbackData, prefix="pagination"):
+    url: str
+    action: str
+
+
+def TypeInlineKeyboard(category_id, by_url=False):
+    data_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
     inline_keyboard = []
 
-    for item in items:
+    for item in data_from_api["results"]:
         inline_keyboard.append(
             [InlineKeyboardButton(
                 text=item["name"],
@@ -72,6 +77,25 @@ def TypeInlineKeyboard(category_id):
                     measurement=item["measurement"]["name"],
                 ).pack()
             )])
+
+    if data_from_api["next"]:
+        inline_keyboard.append([InlineKeyboardButton(
+                    text=">>>",
+                    callback_data=PaginationCallbackFactory(
+                        action="next",
+                        url=data_from_api["next"],
+                    ).pack()
+        )])
+
+    if data_from_api["previous"]:
+        inline_keyboard.append([InlineKeyboardButton(
+                    text="<<<",
+                    callback_data=PaginationCallbackFactory(
+                        action="previous",
+                        url=data_from_api["previous"]
+                    ).pack()
+        )])
+
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
 
