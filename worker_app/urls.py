@@ -2,8 +2,8 @@ from django.urls import path
 
 from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
-from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, WorkTypeListByCategory, \
-    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView
+from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, \
+    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView, WorkTypeListByCategory
 
 urlpatterns = [
     # WORKERS
@@ -13,7 +13,7 @@ urlpatterns = [
 
     #  OBJECTS
     path("objects", ObjectListViewSet.as_view({'get': 'list', }), name="objects", ),
-    path('object/<int:object_id>/categories/', CategoryListView.as_view(), name='object-categories'),
+    path('object/<int:object_id>/categories/', CategoryListView.as_view({'get': 'list', }), name='object-categories'),
 
     #  WORK TYPES
     path('work_types/object/<int:object_id>/', WorkTypesByObjectView.as_view(), name='work_types_by_object'),

@@ -57,7 +57,12 @@ def post_worker_registration(name, surname, telephone, telegram_id):
 def get_category_list_by_object_id(object_id):
     url = f"{BASE_URL}/object/{object_id}/categories/"
     response = requests.get(url=url)
-    return response.json()["categories"]
+    return response.json()
+
+
+def get_category_list_by_paginated_url(url):
+    response = requests.get(url=url)
+    return response.json()
 
 
 # TYPE OF WORK

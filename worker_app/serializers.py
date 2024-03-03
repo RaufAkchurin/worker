@@ -35,8 +35,16 @@ class ObjectSerializer(serializers.ModelSerializer):
         )
 
 
-class MeasurementSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            "id",
+            "name",
+        )
 
+
+class MeasurementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Measurement
         fields = (
@@ -66,6 +74,3 @@ class ShiftCreationSerializer(serializers.ModelSerializer):
             "work_type",
             "value",
         )
-
-
-

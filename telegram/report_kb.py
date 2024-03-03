@@ -3,7 +3,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
-    get_work_type_list_by_category_id, get_work_type_list_by_paginated_url, get_object_by_paginated_url
+    get_work_type_list_by_category_id, get_work_type_list_by_paginated_url, get_object_by_paginated_url, \
+    get_category_list_by_paginated_url
 from datetime import datetime, timedelta
 
 
@@ -45,11 +46,15 @@ class CategoryCallbackFactory(CallbackData, prefix="category"):
     name: str
 
 
-def CategoryInlineKeyboard(object_id):
-    categories = get_category_list_by_object_id(object_id)
+def CategoryInlineKeyboard(object_id, url=None):
+    if url:
+        url = "http://127.0.0.1:8000/" + url
+        query_from_api = get_category_list_by_paginated_url(url)
+    else:
+        query_from_api = get_category_list_by_object_id(object_id)
     inline_keyboard = []
 
-    for category in categories:
+    for category in query_from_api["results"]:
         inline_keyboard.append(
             [InlineKeyboardButton(
                 text=category["name"],
@@ -59,6 +64,7 @@ def CategoryInlineKeyboard(object_id):
                     action="change_category"
                 ).pack()
             )])
+    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
     category_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return category_inline_markup
 
@@ -90,7 +96,7 @@ def add_pag_bottoms(query_from_api, inline_keyboard):
     return inline_keyboard
 
 
-def TypeInlineKeyboard(category_id, by_url=False, url=None):
+def TypeInlineKeyboard(category_id, url=None):
     # TODO урлы сделать динамические
     if url:
         url = "http://127.0.0.1:8000/" + url

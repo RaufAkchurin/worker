@@ -2,7 +2,7 @@ from rest_framework import viewsets, generics
 from rest_framework.pagination import PageNumberPagination
 
 from worker_app.models import Category, Worker
-from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer
+from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer, CategorySerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -101,20 +101,31 @@ class ObjectListViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class CategoryListView(APIView):
-    def get(self, request, object_id):
+class CategoryListView(viewsets.ModelViewSet):
+    # page size depended from page size WorkTypeListByCategory and i don't known why
+    serializer_class = CategorySerializer  # Replace with your actual serializer class
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 4
+
+    def get_queryset(self):
+        object_id = self.kwargs.get('object_id')
         try:
-            # Получаем объект по айди
             object_instance = Object.objects.get(id=object_id)
-            # Получаем все виды работ для данного объекта
-            categories = Category.objects.filter(object=object_instance)
-            # Получаем уникальные категории с айди и названием
-            unique_categories = categories.values('id', 'name').distinct()
-            # Преобразуем каждую категорию в словарь
-            categories_list = [{'id': category['id'], 'name': category['name']} for category in unique_categories]
-            return Response({'categories': categories_list})
+            categories = Category.objects.filter(object=object_instance).distinct()
+            return categories
         except Object.DoesNotExist:
-            return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Category.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class WorkTypeListByCategory(generics.ListAPIView):
