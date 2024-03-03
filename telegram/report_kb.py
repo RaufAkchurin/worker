@@ -3,7 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
-    get_work_type_list_by_category_id
+    get_work_type_list_by_category_id, get_work_type_list_by_url
 from datetime import datetime, timedelta
 
 
@@ -63,36 +63,40 @@ class PaginationCallbackFactory(CallbackData, prefix="pagination"):
     action: str
 
 
-def TypeInlineKeyboard(category_id, by_url=False):
-    data_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
+def TypeInlineKeyboard(category_id, by_url=False, url=None):
+    if by_url:
+        url = "http://127.0.0.1:8000/" + url
+        query_from_api = get_work_type_list_by_url(url)
+    else:
+        query_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
     inline_keyboard = []
 
-    for item in data_from_api["results"]:
+    for item in query_from_api["results"]:
         inline_keyboard.append(
             [InlineKeyboardButton(
                 text=item["name"],
                 callback_data=TypeCallbackFactory(
                     id=str(item["id"]),
-                    name=item["name"],
-                    measurement=item["measurement"]["name"],
+                    name=item["name"][:30],
+                    measurement=item["measurement"]["name"][:30],
                 ).pack()
             )])
 
-    if data_from_api["next"]:
+    if query_from_api["next"]:
         inline_keyboard.append([InlineKeyboardButton(
                     text=">>>",
                     callback_data=PaginationCallbackFactory(
                         action="next",
-                        url=data_from_api["next"],
+                        url=query_from_api["next"],
                     ).pack()
         )])
 
-    if data_from_api["previous"]:
+    if query_from_api["previous"]:
         inline_keyboard.append([InlineKeyboardButton(
                     text="<<<",
                     callback_data=PaginationCallbackFactory(
                         action="previous",
-                        url=data_from_api["previous"]
+                        url=query_from_api["previous"]
                     ).pack()
         )])
 

@@ -92,13 +92,13 @@ async def echo(message: Message):
         await message.answer(f"{smiles[0][0]} - <b>{smiles[0][1]}</b>", reply_markup=paginator())
 
 
-# @dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
-# async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
-#     if callback_data.action == "next":
-#         await query.message.edit_text(
-#             f"{smiles[page][0]} - <b>{smiles[page][1]}</b>",
-#             reply_markup=paginator(page)
-#         )
+@dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
+async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
+    if callback_data.action:
+        await query.message.edit_text(
+            text="BLA BLA BLA",
+            reply_markup=TypeInlineKeyboard(by_url=True, url=callback_data.url, category_id=None)
+        )
 
 
 @dp.callback_query(DateCallbackFactory.filter())
@@ -132,7 +132,7 @@ async def process_category_press(callback: CallbackQuery,
     await state.update_data(selected_category_name=callback_data.name)
     await callback.bot.send_message(callback.message.chat.id,
                                     text=f'Название категории: {callback_data.name}\n',
-                                    reply_markup=TypeInlineKeyboard(callback_data.id)
+                                    reply_markup=TypeInlineKeyboard(category_id=callback_data.id)
                                     )
 
 

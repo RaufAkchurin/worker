@@ -55,19 +55,14 @@ class CategoryListView(APIView):
         try:
             # Получаем объект по айди
             object_instance = Object.objects.get(id=object_id)
-
             # Получаем все виды работ для данного объекта
             categories = Category.objects.filter(object=object_instance)
-
             # Получаем уникальные категории с айди и названием
             unique_categories = categories.values('id', 'name').distinct()
-
             # Преобразуем каждую категорию в словарь
             categories_list = [{'id': category['id'], 'name': category['name']} for category in
                                unique_categories]
-
             return Response({'categories': categories_list})
-
         except Object.DoesNotExist:
             return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
 

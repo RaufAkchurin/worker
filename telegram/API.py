@@ -58,6 +58,11 @@ def get_work_type_list_by_category_id(category_id):
     return response.json()
 
 
+def get_work_type_list_by_url(url):
+    response = requests.get(url=url)
+    return response.json()
+
+
 def get_work_type_list_by_object_id(object_id):
     url = f"{BASE_URL}/work_types/object/{object_id}/"
     response = requests.get(url=url)
