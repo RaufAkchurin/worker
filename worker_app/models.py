@@ -30,6 +30,7 @@ class Object(models.Model):
     name = models.CharField(max_length=255, verbose_name='Название')
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Объект'
         verbose_name_plural = 'Объекты'
 
@@ -42,6 +43,7 @@ class Category(models.Model):
     object = models.ForeignKey(Object, on_delete=models.CASCADE, verbose_name='Объект')
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -59,6 +61,7 @@ class WorkType(models.Model):
     measurement_type = models.ForeignKey(Measurement, on_delete=models.CASCADE, verbose_name='Ед.изм.')
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Тип работ'
         verbose_name_plural = 'Типы работ'
 

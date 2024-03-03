@@ -3,8 +3,13 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
-    get_work_type_list_by_category_id, get_work_type_list_by_url
+    get_work_type_list_by_category_id, get_work_type_list_by_paginated_url, get_object_by_paginated_url
 from datetime import datetime, timedelta
+
+
+class PaginationCallbackFactory(CallbackData, prefix="pagination"):
+    url: str
+    action: str
 
 
 class ObjectCallbackFactory(CallbackData, prefix="object"):
@@ -12,11 +17,16 @@ class ObjectCallbackFactory(CallbackData, prefix="object"):
     name: str
 
 
-def ObjectInlineKeyboard():
-    objects = get_object_list()
+def ObjectInlineKeyboard(url: str = None):
+    if url:
+        url = "http://127.0.0.1:8000/" + url
+        query_from_api = get_object_by_paginated_url(url)
+    else:
+        query_from_api = get_object_list()
+
     inline_keyboard = []
 
-    for object in objects:
+    for object in query_from_api["results"]:
         inline_keyboard.append(
             [InlineKeyboardButton(
                 text=object["name"],
@@ -25,6 +35,7 @@ def ObjectInlineKeyboard():
                     name=object["name"]
                 ).pack()
             )])
+    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
 
@@ -58,30 +69,7 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
     measurement: str
 
 
-class PaginationCallbackFactory(CallbackData, prefix="pagination"):
-    url: str
-    action: str
-
-
-def TypeInlineKeyboard(category_id, by_url=False, url=None):
-    if by_url:
-        url = "http://127.0.0.1:8000/" + url
-        query_from_api = get_work_type_list_by_url(url)
-    else:
-        query_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
-    inline_keyboard = []
-
-    for item in query_from_api["results"]:
-        inline_keyboard.append(
-            [InlineKeyboardButton(
-                text=item["name"],
-                callback_data=TypeCallbackFactory(
-                    id=str(item["id"]),
-                    name=item["name"][:20],
-                    measurement=item["measurement"]["name"],
-                ).pack()
-            )])
-
+def add_pag_bottoms(query_from_api, inline_keyboard):
     if query_from_api["next"]:
         inline_keyboard.append([InlineKeyboardButton(
             text=">>>",
@@ -99,7 +87,30 @@ def TypeInlineKeyboard(category_id, by_url=False, url=None):
                 url=query_from_api["previous"]
             ).pack()
         )])
+    return inline_keyboard
 
+
+def TypeInlineKeyboard(category_id, by_url=False, url=None):
+    # TODO урлы сделать динамические
+    if url:
+        url = "http://127.0.0.1:8000/" + url
+        query_from_api = get_work_type_list_by_paginated_url(url)
+    else:
+        query_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
+    inline_keyboard = []
+
+    for item in query_from_api["results"]:
+        inline_keyboard.append(
+            [InlineKeyboardButton(
+                text=item["name"],
+                callback_data=TypeCallbackFactory(
+                    id=str(item["id"]),
+                    name=item["name"][:20],
+                    measurement=item["measurement"]["name"],
+                ).pack()
+            )])
+
+    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
 

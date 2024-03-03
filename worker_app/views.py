@@ -45,28 +45,6 @@ class WorkerRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ObjectListViewSet(viewsets.ModelViewSet):
-    serializer_class = ObjectSerializer
-    queryset = Object.objects.all()
-
-
-class CategoryListView(APIView):
-    def get(self, request, object_id):
-        try:
-            # Получаем объект по айди
-            object_instance = Object.objects.get(id=object_id)
-            # Получаем все виды работ для данного объекта
-            categories = Category.objects.filter(object=object_instance)
-            # Получаем уникальные категории с айди и названием
-            unique_categories = categories.values('id', 'name').distinct()
-            # Преобразуем каждую категорию в словарь
-            categories_list = [{'id': category['id'], 'name': category['name']} for category in
-                               unique_categories]
-            return Response({'categories': categories_list})
-        except Object.DoesNotExist:
-            return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
 class WorkTypesByObjectView(View):
     def get(self, request, object_id):
         # Get the object or return a 404 error if not found
@@ -103,6 +81,44 @@ class CustomPageNumberPagination(PageNumberPagination):
             'previous': prev_url_cut,
             'results': data
         })
+
+
+class ObjectListViewSet(viewsets.ModelViewSet):
+    serializer_class = ObjectSerializer
+    queryset = Object.objects.all()
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 4
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class CategoryListView(APIView):
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 4
+
+    def get(self, request, object_id):
+        try:
+            # Получаем объект по айди
+            object_instance = Object.objects.get(id=object_id)
+            # Получаем все виды работ для данного объекта
+            categories = Category.objects.filter(object=object_instance)
+            # Получаем уникальные категории с айди и названием
+            unique_categories = categories.values('id', 'name').distinct()
+            # Преобразуем каждую категорию в словарь
+            categories_list = [{'id': category['id'], 'name': category['name']} for category in
+                               unique_categories]
+            return Response({'categories': categories_list})
+        except Object.DoesNotExist:
+            return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class WorkTypeListByCategory(generics.ListAPIView):

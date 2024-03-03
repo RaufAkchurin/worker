@@ -16,6 +16,11 @@ def get_object_list():
     return response.json()
 
 
+def get_object_by_paginated_url(url):
+    response = requests.get(url=url)
+    return response.json()
+
+
 def get_worker_list():
     url = f"{BASE_URL}/workers"
     response = requests.get(url=url)
@@ -58,7 +63,7 @@ def get_work_type_list_by_category_id(category_id):
     return response.json()
 
 
-def get_work_type_list_by_url(url):
+def get_work_type_list_by_paginated_url(url):
     response = requests.get(url=url)
     return response.json()
 
