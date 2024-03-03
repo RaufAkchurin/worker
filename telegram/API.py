@@ -10,6 +10,7 @@ load_dotenv()
 BASE_URL = 'http://' + os.getenv('LOCALHOST_IP') + '/api/v1'
 
 
+# OBJECT
 def get_object_list():
     url = f"{BASE_URL}/objects"
     response = requests.get(url=url)
@@ -21,6 +22,7 @@ def get_object_by_paginated_url(url):
     return response.json()
 
 
+# WORKER
 def get_worker_list():
     url = f"{BASE_URL}/workers"
     response = requests.get(url=url)
@@ -51,12 +53,14 @@ def post_worker_registration(name, surname, telephone, telegram_id):
         return False
 
 
+# CATEGORY
 def get_category_list_by_object_id(object_id):
     url = f"{BASE_URL}/object/{object_id}/categories/"
     response = requests.get(url=url)
     return response.json()["categories"]
 
 
+# TYPE OF WORK
 def get_work_type_list_by_category_id(category_id):
     url = f"{BASE_URL}/work_types/category/{category_id}/"
     response = requests.get(url=url)
@@ -74,6 +78,7 @@ def get_work_type_list_by_object_id(object_id):
     return response.json()["work_types"]
 
 
+# SHIFT
 async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, bot: Bot):
     url = f"{BASE_URL}/shift_creation"
     data = {

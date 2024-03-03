@@ -102,9 +102,6 @@ class ObjectListViewSet(viewsets.ModelViewSet):
 
 
 class CategoryListView(APIView):
-    pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 4
-
     def get(self, request, object_id):
         try:
             # Получаем объект по айди
