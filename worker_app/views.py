@@ -108,7 +108,7 @@ class CustomPageNumberPagination(PageNumberPagination):
 class WorkTypeListByCategory(generics.ListAPIView):
     serializer_class = WorkTypeSerializer
     pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 10
+    pagination_class.page_size = 4
 
     def get_queryset(self):
         category_id = self.kwargs['category_id']

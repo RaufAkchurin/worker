@@ -96,7 +96,7 @@ async def echo(message: Message):
 async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
     if callback_data.action:
         await query.message.edit_text(
-            text="BLA BLA BLA",
+            text="Выберите нужный вариант",
             reply_markup=TypeInlineKeyboard(by_url=True, url=callback_data.url, category_id=None)
         )
 

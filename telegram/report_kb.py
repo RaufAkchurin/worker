@@ -77,27 +77,27 @@ def TypeInlineKeyboard(category_id, by_url=False, url=None):
                 text=item["name"],
                 callback_data=TypeCallbackFactory(
                     id=str(item["id"]),
-                    name=item["name"][:30],
-                    measurement=item["measurement"]["name"][:30],
+                    name=item["name"][:20],
+                    measurement=item["measurement"]["name"],
                 ).pack()
             )])
 
     if query_from_api["next"]:
         inline_keyboard.append([InlineKeyboardButton(
-                    text=">>>",
-                    callback_data=PaginationCallbackFactory(
-                        action="next",
-                        url=query_from_api["next"],
-                    ).pack()
+            text=">>>",
+            callback_data=PaginationCallbackFactory(
+                action="next",
+                url=query_from_api["next"],
+            ).pack()
         )])
 
     if query_from_api["previous"]:
         inline_keyboard.append([InlineKeyboardButton(
-                    text="<<<",
-                    callback_data=PaginationCallbackFactory(
-                        action="previous",
-                        url=query_from_api["previous"]
-                    ).pack()
+            text="<<<",
+            callback_data=PaginationCallbackFactory(
+                action="previous",
+                url=query_from_api["previous"]
+            ).pack()
         )])
 
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
