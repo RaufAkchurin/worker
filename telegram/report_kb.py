@@ -151,7 +151,7 @@ class PaginationCallbackFactory(CallbackData, prefix="pagination"):
 
 def add_pagination_bottoms(query_from_api, inline_keyboard):
     try:
-        pages_count = math.ceil(query_from_api["count"] / 4)
+        pages_count = math.ceil(query_from_api["count"] / 10)
         if query_from_api["next"]:
             current_page = int(query_from_api["next"][-1]) - 1
         else:

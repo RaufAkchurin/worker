@@ -87,7 +87,7 @@ class ObjectListViewSet(viewsets.ModelViewSet):
     serializer_class = ObjectSerializer
     queryset = Object.objects.all()
     pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 4
+    pagination_class.page_size = 10
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -105,7 +105,7 @@ class CategoryListView(viewsets.ModelViewSet):
     # page size depended from page size WorkTypeListByCategory and i don't known why
     serializer_class = CategorySerializer  # Replace with your actual serializer class
     pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 4
+    pagination_class.page_size = 10
 
     def get_queryset(self):
         object_id = self.kwargs.get('object_id')
@@ -131,7 +131,7 @@ class CategoryListView(viewsets.ModelViewSet):
 class WorkTypeListByCategory(generics.ListAPIView):
     serializer_class = WorkTypeSerializer
     pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 4
+    pagination_class.page_size = 10
 
     def get_queryset(self):
         category_id = self.kwargs['category_id']
