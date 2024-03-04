@@ -38,7 +38,7 @@ def ObjectInlineKeyboard(url: str = None):
                     name=object["name"]
                 ).pack()
             )])
-    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
 
@@ -66,7 +66,7 @@ def CategoryInlineKeyboard(object_id, url=None):
                     action="change_category"
                 ).pack()
             )])
-    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
     category_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return category_inline_markup
 
@@ -77,52 +77,50 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
     measurement: str
 
 
-def add_pag_bottoms(query_from_api, inline_keyboard):
-    if query_from_api["next"] and not query_from_api["previous"]:
-        inline_keyboard.append([InlineKeyboardButton(
-            text=">>>",
-            callback_data=PaginationCallbackFactory(
-                action="next",
-                url=query_from_api["next"],
-            ).pack()
-        )])
+def add_pagination_bottoms(query_from_api, inline_keyboard):
+    try:
+        pages_count = math.ceil(query_from_api["count"] / 4)
+        if query_from_api["next"]:
+            current_page = int(query_from_api["next"][-1]) - 1
+        else:
+            current_page = pages_count
+    except ZeroDivisionError:
+        pages_count = 0
+        current_page = 0
 
-    if query_from_api["previous"] and not query_from_api["next"]:
-        inline_keyboard.append([InlineKeyboardButton(
-            text="<<<",
-            callback_data=PaginationCallbackFactory(
-                action="previous",
-                url=query_from_api["previous"]
-            ).pack()
-        )])
-
-    if query_from_api["next"] and query_from_api["previous"]:
-        pages_count = math.ceil(query_from_api["count"] / len(inline_keyboard))
-        current_page = int(query_from_api["next"][-1]) - 1
-
-
-        inline_keyboard.append([
-            InlineKeyboardButton(
-                text="<<<",
-                callback_data=PaginationCallbackFactory(
-                    action="previous",
-                    url=query_from_api["previous"]
-                ).pack()
-            ),
-            InlineKeyboardButton(
+    progress_bottom = InlineKeyboardButton(
                 text=f"{current_page} из {pages_count}",
                 callback_data=PaginationCallbackFactory(
                     action="counter",
                     url="counter"
                 ).pack()
-            ),
-            InlineKeyboardButton(
+            )
+
+    if query_from_api["next"]:
+        next_bottom = InlineKeyboardButton(
                 text=">>>",
                 callback_data=PaginationCallbackFactory(
                     action="next",
                     url=query_from_api["next"],
                 ).pack()
-            )])
+            )
+
+    if query_from_api["previous"]:
+        previous_bottom = InlineKeyboardButton(
+            text="<<<",
+            callback_data=PaginationCallbackFactory(
+                action="previous",
+                url=query_from_api["previous"]
+            ).pack()
+        )
+    if query_from_api["next"] and not query_from_api["previous"]:
+        inline_keyboard.append([progress_bottom, next_bottom])
+
+    if query_from_api["previous"] and not query_from_api["next"]:
+        inline_keyboard.append([previous_bottom, progress_bottom])
+
+    if query_from_api["next"] and query_from_api["previous"]:
+        inline_keyboard.append([previous_bottom, progress_bottom, next_bottom])
 
     return inline_keyboard
 
@@ -147,7 +145,7 @@ def TypeInlineKeyboard(category_id, url=None):
                 ).pack()
             )])
 
-    inline_keyboard = add_pag_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
 
