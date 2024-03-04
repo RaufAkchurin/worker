@@ -32,7 +32,7 @@ def ObjectInlineKeyboard(url: str = None):
                 text=object["name"],
                 callback_data=ObjectCallbackFactory(
                     id=str(object["id"]),
-                    name=object["name"]
+                    name=object["name"][:20]
                 ).pack()
             )])
     inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
@@ -60,7 +60,7 @@ def CategoryInlineKeyboard(object_id, url=None):
                 text=category["name"],
                 callback_data=CategoryCallbackFactory(
                     id=str(category["id"]),
-                    name=category["name"],
+                    name=category["name"][:20],
                     action="change_category"
                 ).pack()
             )])
