@@ -1,4 +1,5 @@
 import math
+import os
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -9,10 +10,7 @@ from API import get_object_list, get_category_list_by_object_id, get_work_type_l
     get_category_list_by_paginated_url
 from datetime import datetime, timedelta
 
-
-class PaginationCallbackFactory(CallbackData, prefix="pagination"):
-    url: str
-    action: str
+localhost = os.getenv('LOCALHOST_IP')
 
 
 class ObjectCallbackFactory(CallbackData, prefix="object"):
@@ -22,8 +20,7 @@ class ObjectCallbackFactory(CallbackData, prefix="object"):
 
 def ObjectInlineKeyboard(url: str = None):
     if url:
-        url = "http://127.0.0.1:8000/" + url
-        query_from_api = get_object_by_paginated_url(url)
+        query_from_api = get_object_by_paginated_url(f"http://{localhost}/" + url)
     else:
         query_from_api = get_object_list()
 
@@ -43,6 +40,8 @@ def ObjectInlineKeyboard(url: str = None):
     return object_inline_markup
 
 
+# CATEGORY ITEMS
+
 class CategoryCallbackFactory(CallbackData, prefix="category"):
     id: str
     name: str
@@ -50,8 +49,7 @@ class CategoryCallbackFactory(CallbackData, prefix="category"):
 
 def CategoryInlineKeyboard(object_id, url=None):
     if url:
-        url = "http://127.0.0.1:8000/" + url
-        query_from_api = get_category_list_by_paginated_url(url)
+        query_from_api = get_category_list_by_paginated_url(f"http://{localhost}/" + url)
     else:
         query_from_api = get_category_list_by_object_id(object_id)
     inline_keyboard = []
@@ -71,65 +69,17 @@ def CategoryInlineKeyboard(object_id, url=None):
     return category_inline_markup
 
 
+# TYPE ITEMS
+
 class TypeCallbackFactory(CallbackData, prefix="type"):
     id: str
     name: str
     measurement: str
 
 
-def add_pagination_bottoms(query_from_api, inline_keyboard):
-    try:
-        pages_count = math.ceil(query_from_api["count"] / 4)
-        if query_from_api["next"]:
-            current_page = int(query_from_api["next"][-1]) - 1
-        else:
-            current_page = pages_count
-    except ZeroDivisionError:
-        pages_count = 0
-        current_page = 0
-
-    progress_bottom = InlineKeyboardButton(
-                text=f"{current_page} из {pages_count}",
-                callback_data=PaginationCallbackFactory(
-                    action="counter",
-                    url="counter"
-                ).pack()
-            )
-
-    if query_from_api["next"]:
-        next_bottom = InlineKeyboardButton(
-                text=">>>",
-                callback_data=PaginationCallbackFactory(
-                    action="next",
-                    url=query_from_api["next"],
-                ).pack()
-            )
-
-    if query_from_api["previous"]:
-        previous_bottom = InlineKeyboardButton(
-            text="<<<",
-            callback_data=PaginationCallbackFactory(
-                action="previous",
-                url=query_from_api["previous"]
-            ).pack()
-        )
-    if query_from_api["next"] and not query_from_api["previous"]:
-        inline_keyboard.append([progress_bottom, next_bottom])
-
-    if query_from_api["previous"] and not query_from_api["next"]:
-        inline_keyboard.append([previous_bottom, progress_bottom])
-
-    if query_from_api["next"] and query_from_api["previous"]:
-        inline_keyboard.append([previous_bottom, progress_bottom, next_bottom])
-
-    return inline_keyboard
-
-
 def TypeInlineKeyboard(category_id, url=None):
-    # TODO урлы сделать динамические
     if url:
-        url = "http://127.0.0.1:8000/" + url
-        query_from_api = get_work_type_list_by_paginated_url(url)
+        query_from_api = get_work_type_list_by_paginated_url(f"http://{localhost}/" + url)
     else:
         query_from_api = get_work_type_list_by_category_id(category_id)  # we need only 10 ITEMS IN PAGE
     inline_keyboard = []
@@ -150,29 +100,7 @@ def TypeInlineKeyboard(category_id, url=None):
     return type_inline_markup
 
 
-class Pagination(CallbackData, prefix="pag"):
-    action: str
-    page: int
-
-
-def paginator(page: int = 0):
-    builder = InlineKeyboardBuilder()
-    builder.row(
-        InlineKeyboardButton(text="⬅️", callback_data=Pagination(action="prev", page=page).pack()),
-        InlineKeyboardButton(text="▶️", callback_data=Pagination(action="next", page=page).pack()),
-        width=2
-    )
-    return builder.as_markup()
-
-
-def profile_kb(text: str | list):
-    builder = ReplyKeyboardBuilder()
-    if isinstance(text, str):
-        text = [text]
-
-    [builder.button(text=txt) for txt in text]
-    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
-
+# DATE ITEMS
 
 class DateCallbackFactory(CallbackData, prefix="date"):
     date: str
@@ -212,3 +140,67 @@ def DateInlineKeyboard():
 
     inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return inline_markup
+
+
+# PAGINATION ITEMS
+
+class PaginationCallbackFactory(CallbackData, prefix="pagination"):
+    url: str
+    action: str
+
+
+def add_pagination_bottoms(query_from_api, inline_keyboard):
+    try:
+        pages_count = math.ceil(query_from_api["count"] / 4)
+        if query_from_api["next"]:
+            current_page = int(query_from_api["next"][-1]) - 1
+        else:
+            current_page = pages_count
+    except ZeroDivisionError:
+        pages_count = 0
+        current_page = 0
+
+    progress_bottom = InlineKeyboardButton(
+        text=f"{current_page} из {pages_count}",
+        callback_data=PaginationCallbackFactory(
+            action="counter",
+            url="counter"
+        ).pack()
+    )
+
+    if query_from_api["next"]:
+        next_bottom = InlineKeyboardButton(
+            text="▶️",
+            callback_data=PaginationCallbackFactory(
+                action="next",
+                url=query_from_api["next"],
+            ).pack()
+        )
+
+    if query_from_api["previous"]:
+        previous_bottom = InlineKeyboardButton(
+            text="⬅️",
+            callback_data=PaginationCallbackFactory(
+                action="previous",
+                url=query_from_api["previous"]
+            ).pack()
+        )
+    if query_from_api["next"] and not query_from_api["previous"]:
+        inline_keyboard.append([progress_bottom, next_bottom])
+
+    if query_from_api["previous"] and not query_from_api["next"]:
+        inline_keyboard.append([previous_bottom, progress_bottom])
+
+    if query_from_api["next"] and query_from_api["previous"]:
+        inline_keyboard.append([previous_bottom, progress_bottom, next_bottom])
+
+    return inline_keyboard
+
+
+def profile_kb(text: str | list):
+    builder = ReplyKeyboardBuilder()
+    if isinstance(text, str):
+        text = [text]
+
+    [builder.button(text=txt) for txt in text]
+    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)

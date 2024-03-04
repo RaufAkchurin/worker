@@ -7,7 +7,6 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
-from contextlib import suppress
 
 import bot_kb
 from API import get_worker_by_telegram
@@ -15,11 +14,10 @@ from registartion import RegisterState, register_start, register_name, register_
     register_confirmation
 from report import ReportState, report_value_input, report_confirmation
 from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard, paginator, Pagination, \
+    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard, \
     PaginationCallbackFactory
 import os
 from dotenv import load_dotenv
-from aiogram.exceptions import TelegramBadRequest
 
 load_dotenv()
 
@@ -54,28 +52,6 @@ async def start(message: Message):
                                reply_markup=bot_kb.main_kb)
 
 
-smiles = [
-    ["🥑", "я люблю автокадо"],
-    ["😊", "улыбайся"],
-    ["🙈", "stesnaysa"],
-]
-
-
-@dp.callback_query(Pagination.filter(F.action.in_(["next", "prev"])))
-async def pagination_handler(call: CallbackQuery, callback_data: Pagination):
-    page_num = int(callback_data.page)
-    page = page_num - 1 if page_num > 0 else 0
-
-    if callback_data.action == "next":
-        page = page_num + 1 if page_num < (len(smiles) - 1) else page_num
-
-    with suppress(TelegramBadRequest):
-        await call.message.edit_text(
-            f"{smiles[page][0]} - <b>{smiles[page][1]}</b>",
-            reply_markup=paginator(page)
-        )
-
-
 @dp.message()
 async def echo(message: Message):
     msg = message.text.lower()
@@ -88,8 +64,6 @@ async def echo(message: Message):
                                    text="⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
     elif msg == "перезагрузить бота":
         await bot.send_message(message.from_user.id, text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
-    elif msg == "смайлики":
-        await message.answer(f"{smiles[0][0]} - <b>{smiles[0][1]}</b>", reply_markup=paginator())
 
 
 @dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
