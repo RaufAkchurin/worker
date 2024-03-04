@@ -1,3 +1,5 @@
+import math
+
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
@@ -95,19 +97,32 @@ def add_pag_bottoms(query_from_api, inline_keyboard):
         )])
 
     if query_from_api["next"] and query_from_api["previous"]:
-        inline_keyboard.append([InlineKeyboardButton(
-            text="<<<",
-            callback_data=PaginationCallbackFactory(
-                action="previous",
-                url=query_from_api["previous"]
-            ).pack()
-        ), InlineKeyboardButton(
-            text=">>>",
-            callback_data=PaginationCallbackFactory(
-                action="next",
-                url=query_from_api["next"],
-            ).pack()
-        )])
+        pages_count = math.ceil(query_from_api["count"] / len(inline_keyboard))
+        current_page = int(query_from_api["next"][-1]) - 1
+
+
+        inline_keyboard.append([
+            InlineKeyboardButton(
+                text="<<<",
+                callback_data=PaginationCallbackFactory(
+                    action="previous",
+                    url=query_from_api["previous"]
+                ).pack()
+            ),
+            InlineKeyboardButton(
+                text=f"{current_page} из {pages_count}",
+                callback_data=PaginationCallbackFactory(
+                    action="counter",
+                    url="counter"
+                ).pack()
+            ),
+            InlineKeyboardButton(
+                text=">>>",
+                callback_data=PaginationCallbackFactory(
+                    action="next",
+                    url=query_from_api["next"],
+                ).pack()
+            )])
 
     return inline_keyboard
 
