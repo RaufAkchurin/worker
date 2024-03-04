@@ -76,7 +76,7 @@ class TypeCallbackFactory(CallbackData, prefix="type"):
 
 
 def add_pag_bottoms(query_from_api, inline_keyboard):
-    if query_from_api["next"]:
+    if query_from_api["next"] and not query_from_api["previous"]:
         inline_keyboard.append([InlineKeyboardButton(
             text=">>>",
             callback_data=PaginationCallbackFactory(
@@ -85,7 +85,7 @@ def add_pag_bottoms(query_from_api, inline_keyboard):
             ).pack()
         )])
 
-    if query_from_api["previous"]:
+    if query_from_api["previous"] and not query_from_api["next"]:
         inline_keyboard.append([InlineKeyboardButton(
             text="<<<",
             callback_data=PaginationCallbackFactory(
@@ -93,6 +93,22 @@ def add_pag_bottoms(query_from_api, inline_keyboard):
                 url=query_from_api["previous"]
             ).pack()
         )])
+
+    if query_from_api["next"] and query_from_api["previous"]:
+        inline_keyboard.append([InlineKeyboardButton(
+            text="<<<",
+            callback_data=PaginationCallbackFactory(
+                action="previous",
+                url=query_from_api["previous"]
+            ).pack()
+        ), InlineKeyboardButton(
+            text=">>>",
+            callback_data=PaginationCallbackFactory(
+                action="next",
+                url=query_from_api["next"],
+            ).pack()
+        )])
+
     return inline_keyboard
 
 
