@@ -6,7 +6,7 @@ from aiogram.types import Message
 
 from API import post_shift_creation, get_worker_by_telegram
 from report_kb import DateInlineKeyboard
-from telegram import bot_kb
+import bot_kb
 
 
 # TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
