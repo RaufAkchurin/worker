@@ -93,3 +93,8 @@ class Cleaner:
             await self._del(message_id=message_id)
 
         self.messages_for_chat.clear()
+
+    async def del_count(self, count):
+        """Delete all messages from the chat."""
+        for message_id in self.messages_for_chat[-count:]:
+            await self._del(message_id=message_id)

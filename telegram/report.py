@@ -15,7 +15,6 @@ import bot_kb
 class ReportState(StatesGroup):
     type_choice = State()
     value = State()
-    # adding_continue = State()
     confirmation = State()
 
 
@@ -38,7 +37,7 @@ async def message_to_confirmation(message: Message, state: FSMContext,
                     "Подтверждаете введённые данные? (да/нет)"
                     )
 
-    await bot.send_message(
+    msg = await bot.send_message(
         message.from_user.id, text=message_text,
         parse_mode=ParseMode.HTML,
         reply_markup=bot_kb.yes_or_no_kb
@@ -69,38 +68,3 @@ async def shift_creation(message: Message, state: FSMContext, bot: Bot):
     return response
 
 
-async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
-    if message.text == "да":
-        result = await shift_creation(message=message, state=state, bot=bot)
-        if result:
-            await bot.send_message(message.from_user.id,
-                                   text="🏆Отчёт успешно добавлен🏆",
-                                   reply_markup=bot_kb.main_kb
-                                   )
-
-        else:
-            await bot.send_message(message.from_user.id,
-                                   text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
-                                   reply_markup=bot_kb.main_kb
-                                   )
-        await state.set_state(ReportState.type_choice)
-        # await state.clear()
-
-        # confirmation to continue adding report
-
-        # await bot.send_message(message.from_user.id, text="Желаете добавить еще работы по данному объекту?",
-        #                        reply_markup=bot_kb.yes_or_no_kb)
-        # if message.text == "да":
-        #     await state.set_state(ReportState.adding_continue)
-        # else:
-        #     await state.clear()
-        #     await bot.send_message(message.from_user.id, text="Спасибо за отчёт!")
-
-
-
-    elif message.text == "нет":
-        await state.clear()
-        await bot.send_message(message.from_user.id, text="Выберите дату для отчёта занова:",
-                               reply_markup=DateInlineKeyboard())
-    else:
-        await bot.send_message(message.from_user.id, text="⚠️ Ответить можно только да или нет⚠️")
