@@ -119,6 +119,7 @@ async def process_category_press(callback: CallbackQuery,
                                     text=f'Название категории: {callback_data.name}\n',
                                     reply_markup=TypeInlineKeyboard(category_id=callback_data.id)
                                     )
+    await state.set_state(ReportState.type_choice)
 
 
 @dp.callback_query(TypeCallbackFactory.filter())

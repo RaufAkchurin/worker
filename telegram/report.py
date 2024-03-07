@@ -13,8 +13,9 @@ import bot_kb
 
 
 class ReportState(StatesGroup):
+    type_choice = State()
     value = State()
-    adding_continue = State()
+    # adding_continue = State()
     confirmation = State()
 
 
@@ -82,7 +83,8 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
                                    text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
                                    reply_markup=bot_kb.main_kb
                                    )
-        await state.clear()
+        await state.set_state(ReportState.type_choice)
+        # await state.clear()
 
         # confirmation to continue adding report
 
