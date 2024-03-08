@@ -34,11 +34,34 @@ class ReportState(StatesGroup):
     type_choice = State()
     value = State()
     confirmation = State()
-    adding_continue = State()
 
 
 async def info_about_choices(message: Message, state: FSMContext,
                              bot: Bot):
+    data = await state.get_data()
+    selected_date = data.get('selected_date')
+    selected_object = data.get('selected_object_name')
+    selected_category = data.get('selected_category_name')
+    selected_type = data.get('selected_type_name')
+    selected_measurement = data.get('selected_type_measurement')
+    selected_value = data.get('report_value')
+
+    message_text = (f'<u><b>Дата:</b></u> {selected_date}   \n' \
+                    f'<u><b>Объект:</b></u> {selected_object}   \n' \
+                    f'<u><b>Категория:</b></u> {selected_category} \n' \
+                    f'<u><b>Тип работ:</b></u> {selected_type} \n' \
+                    f'<u><b>тип изм.:</b></u> {selected_measurement} \n' \
+                    f"<u><b>Объём:</b></u> {selected_value}\n" \
+                    )
+
+    msg = await bot.send_message(
+        message.from_user.id, text=message_text,
+        parse_mode=ParseMode.HTML,
+    )
+    return msg
+
+
+async def info_about_added_report(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     selected_date = data.get('selected_date')
     selected_object = data.get('selected_object_name')
@@ -69,9 +92,9 @@ async def report_value_input(message: Message, state: FSMContext, bot: Bot):
         messages.append(message)
         messages.append(await info_about_choices(message, state, bot))
         messages.append(await bot.send_message(message.from_user.id,
-                                      text="Подтверждаете введённые данные? (да/нет)",
-                                      reply_markup=bot_kb.yes_or_no_kb
-                                      ))
+                                               text="Подтверждаете введённые данные? (да/нет)",
+                                               reply_markup=bot_kb.yes_or_no_kb
+                                               ))
         [await cleaner.add(message.message_id) for message in messages]
         await state.set_state(ReportState.confirmation)
 
@@ -125,13 +148,6 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
                                    )
         await state.set_state(ReportState.type_choice)
 
-        # confirmation to continue adding report
-
-        await bot.send_message(message.from_user.id,
-                               text="Желаете добавить еще работы по данному объекту?",
-                               reply_markup=bot_kb.yes_or_no_kb)
-        await state.set_state(ReportState.adding_continue)
-
     elif message.text == "нет":
         await state.clear()
         msg = await bot.send_message(message.from_user.id,
@@ -170,7 +186,6 @@ dp.message.register(register_confirmation, RegisterState.confirmation)
 # Регистрируем хендлеры отчётов
 dp.message.register(report_value_input, ReportState.value)
 dp.message.register(report_confirmation, ReportState.confirmation)
-dp.message.register(report_continue, ReportState.adding_continue)
 
 
 @dp.message(CommandStart())
