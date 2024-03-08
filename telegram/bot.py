@@ -133,34 +133,32 @@ dp.update.middleware(CleanerMiddleware(cleaner))
 
 
 async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
+    messages = [message,]
     if message.text == "да":
         result = await shift_creation(message=message, state=state, bot=bot)
         if result:
             await info_about_choices(message, state, bot)
             await bot.send_message(message.from_user.id,
                                    text="🏆Отчёт успешно добавлен🏆",
-                                   reply_markup=bot_kb.main_kb
-                                   )
+                                   reply_markup=bot_kb.main_kb)
         else:
-            await bot.send_message(message.from_user.id,
-                                   text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
-                                   reply_markup=bot_kb.main_kb
-                                   )
+            messages.append(await bot.send_message(message.from_user.id,
+                                                   text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
+                                                   reply_markup=bot_kb.main_kb
+                                                   ))
+
         await state.set_state(ReportState.type_choice)
 
     elif message.text == "нет":
         await state.clear()
-        msg = await bot.send_message(message.from_user.id,
-                                     text="Выберите дату для отчёта занова:",
-                                     reply_markup=DateInlineKeyboard())
-        await cleaner.add(msg.message_id)
+        messages.append(await bot.send_message(message.from_user.id,
+                                               text="Выберите дату для отчёта занова:",
+                                               reply_markup=DateInlineKeyboard()))
     else:
-        msg = await bot.send_message(message.from_user.id,
-                                     text="⚠️ Ответить можно только да или нет⚠️")
-        await cleaner.add(msg.message_id)
+        messages.append(await bot.send_message(message.from_user.id,
+                                               text="⚠️ Ответить можно только да или нет⚠️"))
 
-    await cleaner.add(message.message_id)
-
+    [await cleaner.add(message.message_id) for message in messages]
     await cleaner.purge()
 
 
@@ -201,17 +199,24 @@ async def start(message: Message):
 
 @dp.message()
 async def echo(message: Message):
+    messages = []
     msg = message.text.lower()
     if msg == "отправить отчёт":
         if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
-            await bot.send_message(message.from_user.id, text="Выберите дату для отчёта:",
-                                   reply_markup=DateInlineKeyboard())
+            messages.append(await bot.send_message(message.from_user.id,
+                                                   text="Выберите дату для отчёта:",
+                                                   reply_markup=DateInlineKeyboard()))
+
         else:
-            await bot.send_message(message.from_user.id,
-                                   text="⚠️ Вы не можете отправлять отчёты, вам необходимо пройти регистрацию. ⚠️")
+            messages.append(await bot.send_message(message.from_user.id,
+                                                   text="⚠️ Вы не можете отправлять отчёты,"
+                                                        " вам необходимо пройти регистрацию. ⚠️"))
+
     elif msg == "перезагрузить бота":
         await bot.send_message(message.from_user.id, text="Вы перешли в главное меню!",
                                reply_markup=bot_kb.main_kb)
+
+    [await cleaner.add(message.message_id) for message in messages]
 
 
 @dp.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))

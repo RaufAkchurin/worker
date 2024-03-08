@@ -101,9 +101,9 @@ async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, b
         if response.json().get("non_field_errors") == [
             "The fields work_type, date, worker must make a unique set."
         ]:
-            msg = await bot.send_message(worker_tg,
-                                         text="⚠️Вы уже подали отчёт с такой датой на данный тип работ⚠️",
-                                         reply_markup=bot_kb.main_kb)
+            await bot.send_message(worker_tg,
+                                    text="⚠️Вы уже подали отчёт с такой датой на данный тип работ⚠️",
+                                    reply_markup=bot_kb.main_kb)
 
     else:
         return False
