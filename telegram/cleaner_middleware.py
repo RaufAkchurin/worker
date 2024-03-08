@@ -3,7 +3,7 @@ from typing import Callable, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from telegram.cleaner import Cleaner
+from cleaner import Cleaner
 
 
 class CleanerMiddleware(BaseMiddleware):

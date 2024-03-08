@@ -2,19 +2,18 @@ import logging
 import sys
 import asyncio
 
-from aiogram import Bot, Dispatcher, F
+from aiogram import Dispatcher, F
 from aiogram.filters import CommandStart
 from aiogram.types import CallbackQuery
 from registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
 from report_kb import ObjectInlineKeyboard, ObjectCallbackFactory, CategoryInlineKeyboard, TypeInlineKeyboard, \
-    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, DateInlineKeyboard, \
-    PaginationCallbackFactory
+    CategoryCallbackFactory, TypeCallbackFactory, DateCallbackFactory, PaginationCallbackFactory
 import os
 from dotenv import load_dotenv
 
-from telegram.cleaner import Cleaner
-from telegram.middleware.cleaner import CleanerMiddleware
+from cleaner import Cleaner
+from cleaner_middleware import CleanerMiddleware
 
 from aiogram import Bot
 from aiogram.enums import ParseMode

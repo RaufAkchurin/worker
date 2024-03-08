@@ -2,10 +2,9 @@ import os
 
 import requests
 from aiogram import Bot
-from aiogram.types import Message
 from dotenv import load_dotenv
 
-from telegram import bot_kb
+import bot_kb
 
 load_dotenv()
 
