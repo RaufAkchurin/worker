@@ -33,6 +33,7 @@ class ReportState(StatesGroup):
     type_choice = State()
     value = State()
     confirmation = State()
+    need_to_add_more = State()
 
 
 async def info_about_choices(message: Message, state: FSMContext,
@@ -132,21 +133,21 @@ dp.update.middleware(CleanerMiddleware(cleaner))
 
 
 async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
-    messages = [message,]
+    messages = [message, ]
     if message.text == "да":
         result = await shift_creation(message=message, state=state, bot=bot)
         if result:
             await info_about_choices(message, state, bot)
             await bot.send_message(message.from_user.id,
-                                   text="🏆Отчёт успешно добавлен🏆",
-                                   reply_markup=bot_kb.main_kb)
+                                   text="🏆Отчёт успешно добавлен, продолжим?🏆",
+                                   reply_markup=bot_kb.yes_or_no_kb)
+            await state.set_state(ReportState.need_to_add_more)
         else:
             messages.append(await bot.send_message(message.from_user.id,
                                                    text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
                                                    reply_markup=bot_kb.main_kb
                                                    ))
-
-        await state.set_state(ReportState.type_choice)
+            await state.clear()
 
     elif message.text == "нет":
         await state.clear()
@@ -158,20 +159,29 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot):
                                                text="⚠️ Ответить можно только да или нет⚠️"))
 
     [await cleaner.add(message.message_id) for message in messages]
-    await cleaner.purge()
 
 
-async def report_continue(state: FSMContext, message: Message, bot: Bot):
+async def add_more(message: Message, bot: Bot, state: FSMContext):
+    messages = [message,]
+    data = await state.get_data()
+    selected_category_id = data.get("selected_category_id")
     if message.text == "да":
-        data = await state.get_data()
-        selected_object_id = data.get("selected_object_id")
+        await state.set_state(ReportState.type_choice)
         await bot.send_message(message.from_user.id,
-                               text=f'Выберите категорию для следующего добавления',
-                               reply_markup=CategoryInlineKeyboard(selected_object_id))
+                               text=f'В таком случае выберите тип работ из списка',
+                               reply_markup=TypeInlineKeyboard(category_id=selected_category_id))
+        [await cleaner.add(message.message_id) for message in messages]
+
     else:
-        await bot.send_message(message.from_user.id, text="Спасибо за отчёт!")
+        await bot.send_message(message.from_user.id,
+                               text=f'Спасибо большое, скоро вам придёт ексель файл'
+                                    f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
+                               reply_markup=bot_kb.main_kb)
+        # TODO добавить здесь отправку ексель файла юзеру
         await state.clear()
 
+    [await cleaner.add(m.message_id) for m in messages]
+    await cleaner.purge()
 
 # Регистрируем хендлеры регистрации нового пользователя
 dp.message.register(register_start, F.text == 'Регистрация/Профиль')
@@ -183,6 +193,7 @@ dp.message.register(register_confirmation, RegisterState.confirmation)
 # Регистрируем хендлеры отчётов
 dp.message.register(report_value_input, ReportState.value)
 dp.message.register(report_confirmation, ReportState.confirmation)
+dp.message.register(add_more, ReportState.need_to_add_more)
 
 
 @dp.message(CommandStart())
@@ -270,7 +281,7 @@ async def process_category_press(callback: CallbackQuery,
                                  state: FSMContext):
     await state.update_data(selected_category_id=callback_data.id)
     await state.update_data(selected_category_name=callback_data.name)
-    msg = await callback.bot.send_message(callback.message.chat.id,
+    await callback.bot.send_message(callback.message.chat.id,
                                           text=f'Название категории: {callback_data.name}\n',
                                           reply_markup=TypeInlineKeyboard(category_id=callback_data.id)
                                           )
