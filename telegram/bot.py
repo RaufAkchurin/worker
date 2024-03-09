@@ -5,7 +5,7 @@ import asyncio
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import CommandStart
 
-from telegram import keyboards
+from telegram import keyboards, report
 from registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
 from report.report_kb import DateInlineKeyboard
@@ -19,7 +19,6 @@ from aiogram import Bot
 from aiogram.types import Message
 
 from API import get_worker_by_telegram
-from report import hendlers
 from report.hendlers import report_value_input, ReportState, report_confirmation, add_more
 
 load_dotenv()
@@ -74,7 +73,8 @@ async def main() -> None:
 
     # ROUTERS
     dp.include_router(router)
-    dp.include_router(hendlers.router)
+    dp.include_router(report.hendlers.router)
+    dp.include_router(report.new_work_type.hendlers.router)
     ###################################
 
     cleaner = Cleaner(limit=100)
