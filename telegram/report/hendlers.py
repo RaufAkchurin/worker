@@ -3,11 +3,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
-from telegram import bot_kb
+from magic_filter import F
+
 from telegram.API import get_worker_by_telegram, post_shift_creation
-from telegram.cleaner import Cleaner
-from telegram.report_kb import DateInlineKeyboard, DateCallbackFactory, ObjectInlineKeyboard, ObjectCallbackFactory, \
-    CategoryInlineKeyboard, CategoryCallbackFactory, TypeInlineKeyboard, TypeCallbackFactory
+from telegram.cleaner.cleaner import Cleaner
+from telegram.main_kb import main_kb
+from telegram.report.report_kb import DateInlineKeyboard, DateCallbackFactory, ObjectInlineKeyboard, ObjectCallbackFactory, \
+    CategoryInlineKeyboard, CategoryCallbackFactory, TypeInlineKeyboard, TypeCallbackFactory, PaginationCallbackFactory
 
 router = Router()
 
@@ -17,25 +19,6 @@ class ReportState(StatesGroup):
     value = State()
     confirmation = State()
     need_to_add_more = State()
-
-
-@router.message()
-async def echo(message: Message, cleaner):
-    messages = []
-    msg = message.text.lower()
-    if msg == "отправить отчёт":
-        if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
-            messages.append(await message.answer(text="Выберите дату для отчёта:",
-                                                 reply_markup=DateInlineKeyboard()))
-
-        else:
-            messages.append(await message.answer(text="⚠️ Вы не можете отправлять отчёты,"
-                                                      " вам необходимо пройти регистрацию. ⚠️"))
-
-    elif msg == "перезагрузить бота":
-        await message.answer(text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
-
-    [await cleaner.add(message.message_id) for message in messages]
 
 
 @router.callback_query(DateCallbackFactory.filter())
@@ -163,6 +146,27 @@ async def shift_creation(message: Message, state: FSMContext, bot: Bot):
     return response
 
 
+async def report_value_input(message: Message,
+                             state: FSMContext,
+                             bot: Bot,
+                             cleaner: Cleaner):
+    messages = []
+    if message.text.isdigit():
+        await state.update_data(report_value=message.text)
+        messages.append(message)
+        messages.append(await info_about_choices(message, state, bot))
+        messages.append(await bot.send_message(message.from_user.id,
+                                               text="Подтверждаете введённые данные? (да/нет)",
+                                               reply_markup=main_kb.yes_or_no_kb
+                                               ))
+        [await cleaner.add(message.message_id) for message in messages]
+        await state.set_state(ReportState.confirmation)
+
+    else:
+        msg = await bot.send_message(message.from_user.id, text="⚠️ Введите пожалуйста число⚠️ ")
+        await cleaner.add(msg.message_id)
+
+
 async def report_confirmation(message: Message, state: FSMContext, bot: Bot, cleaner: Cleaner):
     messages = [message, ]
     if message.text == "да":
@@ -171,12 +175,12 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot, cle
             await info_about_choices(message, state, bot)
             await bot.send_message(message.from_user.id,
                                    text="🏆Отчёт успешно добавлен, продолжим?🏆",
-                                   reply_markup=bot_kb.yes_or_no_kb)
+                                   reply_markup=main_kb.yes_or_no_kb)
             await state.set_state(ReportState.need_to_add_more)
         else:
             messages.append(await bot.send_message(message.from_user.id,
                                                    text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
-                                                   reply_markup=bot_kb.main_kb
+                                                   reply_markup=main_kb.main_kb
                                                    ))
             await state.clear()
 
@@ -207,7 +211,7 @@ async def add_more(message: Message, bot: Bot, state: FSMContext, cleaner: Clean
         await bot.send_message(message.from_user.id,
                                text=f'Спасибо большое, скоро вам придёт ексель файл'
                                     f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
-                               reply_markup=bot_kb.main_kb)
+                               reply_markup=main_kb.main_kb)
         # TODO добавить здесь отправку ексель файла юзеру
         await state.clear()
 
@@ -215,25 +219,21 @@ async def add_more(message: Message, bot: Bot, state: FSMContext, cleaner: Clean
     await cleaner.purge()
 
 
-async def report_value_input(message: Message,
-                             state: FSMContext,
-                             bot: Bot,
-                             cleaner: Cleaner):
-    messages = []
-    if message.text.isdigit():
-        await state.update_data(report_value=message.text)
-        messages.append(message)
-        messages.append(await info_about_choices(message, state, bot))
-        messages.append(await bot.send_message(message.from_user.id,
-                                               text="Подтверждаете введённые данные? (да/нет)",
-                                               reply_markup=bot_kb.yes_or_no_kb
-                                               ))
-        [await cleaner.add(message.message_id) for message in messages]
-        await state.set_state(ReportState.confirmation)
+@router.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
+async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
+    if "objects" in query.data:
+        await query.message.edit_text(
+            text="Выберите объект",
+            reply_markup=ObjectInlineKeyboard(url=callback_data.url)
+        )
+    elif "categories" in query.data:
+        await query.message.edit_text(
+            text="Выберите категорию",
+            reply_markup=CategoryInlineKeyboard(url=callback_data.url, object_id=None)
+        )
 
-    else:
-        msg = await bot.send_message(message.from_user.id, text="⚠️ Введите пожалуйста число⚠️ ")
-        await cleaner.add(msg.message_id)
-
-
-
+    elif "work_types" in query.data:
+        await query.message.edit_text(
+            text="Выберите тип работ",
+            reply_markup=TypeInlineKeyboard(url=callback_data.url, category_id=None)
+        )

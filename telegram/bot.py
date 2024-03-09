@@ -4,31 +4,23 @@ import asyncio
 
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import CommandStart
-from aiogram.types import CallbackQuery
-from registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
+from telegram.registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
-from report_kb import ObjectInlineKeyboard, CategoryInlineKeyboard, TypeInlineKeyboard, PaginationCallbackFactory
+from telegram.report.report_kb import DateInlineKeyboard
 import os
 from dotenv import load_dotenv
 
-from cleaner import Cleaner
-from cleaner_middleware import CleanerMiddleware
+from telegram.cleaner.cleaner import Cleaner
+from telegram.cleaner.cleaner_middleware import CleanerMiddleware
 
 from aiogram import Bot
 from aiogram.types import Message
 
-from API import  get_worker_by_telegram
-import bot_kb
+from API import get_worker_by_telegram
 from telegram.report import hendlers
 from telegram.report.hendlers import report_value_input, ReportState, report_confirmation, add_more
 
 load_dotenv()
-
-HELP_COMMAND = """
-/help - список команд
-/start - начать работу с ботом
-"""
-
 router = Router()
 
 # Регистрируем хендлеры регистрации нового пользователя
@@ -55,24 +47,23 @@ async def start(message: Message, bot: Bot):
                                reply_markup=bot_kb.main_kb)
 
 
-@router.callback_query(PaginationCallbackFactory.filter(F.action.in_(["next", "previous"])))
-async def paginator(query: CallbackQuery, callback_data: PaginationCallbackFactory):
-    if "objects" in query.data:
-        await query.message.edit_text(
-            text="Выберите объект",
-            reply_markup=ObjectInlineKeyboard(url=callback_data.url)
-        )
-    elif "categories" in query.data:
-        await query.message.edit_text(
-            text="Выберите категорию",
-            reply_markup=CategoryInlineKeyboard(url=callback_data.url, object_id=None)
-        )
+@router.message()
+async def echo(message: Message, cleaner):
+    messages = []
+    msg = message.text.lower()
+    if msg == "отправить отчёт":
+        if get_worker_by_telegram(message.from_user.id):  # Проверяем зарегистрирован ли пользователь
+            messages.append(await message.answer(text="Выберите дату для отчёта:",
+                                                 reply_markup=DateInlineKeyboard()))
 
-    elif "work_types" in query.data:
-        await query.message.edit_text(
-            text="Выберите тип работ",
-            reply_markup=TypeInlineKeyboard(url=callback_data.url, category_id=None)
-        )
+        else:
+            messages.append(await message.answer(text="⚠️ Вы не можете отправлять отчёты,"
+                                                      " вам необходимо пройти регистрацию. ⚠️"))
+
+    elif msg == "перезагрузить бота":
+        await message.answer(text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
+
+    [await cleaner.add(message.message_id) for message in messages]
 
 
 async def main() -> None:

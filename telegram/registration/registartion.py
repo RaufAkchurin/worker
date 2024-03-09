@@ -6,8 +6,6 @@ from aiogram.types import Message
 
 from API import get_worker_by_telegram, post_worker_registration
 
-#TODO добавить передачу бота чтобы не путались сообщения между разными пользователями
-
 
 class RegisterState(StatesGroup):
     regName = State()
@@ -35,7 +33,8 @@ async def register_start(message: Message, state: FSMContext, bot: Bot):
     if worker:
         await answer_for_registered_user(message=message, worker=worker, bot=bot)
     else:
-        await bot.send_message(message.from_user.id, text=f'📝 Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? 📝')
+        await bot.send_message(message.from_user.id,
+                               text=f'📝 Давайте начнём регистрацию \n Для начала скажите, как к вас зовут? 📝')
         await state.set_state(RegisterState.regName)
 
 
@@ -44,23 +43,25 @@ async def register_name(message: Message, state: FSMContext, bot: Bot):
         await state.update_data(regname=message.text)
         await state.set_state(RegisterState.regSurname)
         await bot.send_message(message.from_user.id, text=f'🤝 Приятно познакомиться {message.text.capitalize()} 🤝\n '
-                             f"Введите пожалуйста вашу фамилию"
-                             )
+                                                          f"Введите пожалуйста вашу фамилию"
+                               )
     else:
-        await bot.send_message(message.from_user.id, text="⚠️Имя должно содержать только буквы, и длина не должна превышать 12 символов⚠️")
+        await bot.send_message(message.from_user.id,
+                               text="⚠️Имя должно содержать только буквы, и длина не должна превышать 12 символов⚠️")
 
 
 async def register_surname(message: Message, state: FSMContext, bot: Bot):
     if message.text.isalpha() and len(message.text) <= 12:
         await bot.send_message(message.from_user.id, text=f'⭐ Ваша фамилия {message.text.capitalize()}⭐ \n '
-                             f'📱 Теперь укажите номер телефона, который доступен для связи.\n'
-                             f'                                                             \n'
-                             f'⚠️ Формат телефона: 89172839062\n'
-                             )
+                                                          f'📱 Теперь укажите номер телефона, который доступен для связи.\n'
+                                                          f'                                                             \n'
+                                                          f'⚠️ Формат телефона: 89172839062\n'
+                               )
         await state.update_data(regsurname=message.text)
         await state.set_state(RegisterState.regPhone)
     else:
-        await bot.send_message(message.from_user.id, text="⚠️ Фамилия должна содержать только буквы, и длина не должна превышать 12 символов⚠️")
+        await bot.send_message(message.from_user.id,
+                               text="⚠️ Фамилия должна содержать только буквы, и длина не должна превышать 12 символов⚠️")
 
 
 async def register_phone(message: Message, state: FSMContext, bot: Bot):
@@ -70,11 +71,11 @@ async def register_phone(message: Message, state: FSMContext, bot: Bot):
     regsurname = data_from_state.get('regsurname')
 
     if message.text.isdigit() and len(message.text) == 11:
-        await bot.send_message(message.from_user.id, text=   f'Проверьте ваши данные: \n' \
-                                f'Имя: {regname} \n' \
-                                f'Фамилия: {regsurname} \n' \
-                                f'Телефон: {message.text} \n' \
-                                "Всё верно?(да/нет)")
+        await bot.send_message(message.from_user.id, text=f'Проверьте ваши данные: \n' \
+                                                          f'Имя: {regname} \n' \
+                                                          f'Фамилия: {regsurname} \n' \
+                                                          f'Телефон: {message.text} \n' \
+                                                          "Всё верно?(да/нет)")
         await state.update_data(regtelephone=message.text)
         await state.set_state(RegisterState.confirmation)
     else:
@@ -92,10 +93,11 @@ async def register_confirmation(message: Message, state: FSMContext, bot: Bot):
         response = post_worker_registration(name=name, surname=surname, telephone=telephone, telegram_id=telegram_id)
         if response:
             await bot.send_message(message.from_user.id, text='Регистрация прошла успешно 🆗\n' \
-                                 'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
+                                                              'Теперь вы можете отправлять отчёты о работе с данного аккаунта телеграм 👷')
             await state.clear()  # Очищаем стейт только если прошло положительно иначе - чтобы запускалось занова
         else:
-            await bot.send_message(message.from_user.id, text='⚠️Что то пошло не так, попробуйте снова, или обратитесь к разработчику⚠️')
+            await bot.send_message(message.from_user.id,
+                                   text='⚠️Что то пошло не так, попробуйте снова, или обратитесь к разработчику⚠️')
 
     elif message.text == "нет":
         await state.clear()

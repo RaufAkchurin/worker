@@ -4,7 +4,7 @@ import requests
 from aiogram import Bot
 from dotenv import load_dotenv
 
-import bot_kb
+import main_kb
 
 load_dotenv()
 
