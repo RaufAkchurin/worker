@@ -4,7 +4,7 @@ import requests
 from aiogram import Bot
 from dotenv import load_dotenv
 
-import main_kb
+import keyboards
 
 load_dotenv()
 
@@ -101,7 +101,7 @@ async def post_work_type_create(category, name, measurement_type, created_by, bo
         ]:
             await bot.send_message(worker_tg,
                                    text="⚠️Тип работ с данным названием для данной категории уже существует⚠️",
-                                   reply_markup=bot_kb.main_kb)
+                                   reply_markup=keyboards.main_kb)
     else:
         return False
 
@@ -124,6 +124,6 @@ async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, b
         ]:
             await bot.send_message(worker_tg,
                                    text="⚠️Вы уже подали отчёт с такой датой на данный тип работ⚠️",
-                                   reply_markup=bot_kb.main_kb)
+                                   reply_markup=keyboards.main_kb)
     else:
         return False

@@ -5,10 +5,11 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.enums import ParseMode
 from magic_filter import F
 
-from telegram.API import get_worker_by_telegram, post_shift_creation
-from telegram.cleaner.cleaner import Cleaner
-from telegram.main_kb import main_kb
-from telegram.report.report_kb import DateInlineKeyboard, DateCallbackFactory, ObjectInlineKeyboard, ObjectCallbackFactory, \
+from telegram import keyboards
+from API import get_worker_by_telegram, post_shift_creation
+from cleaner.cleaner import Cleaner
+from report.report_kb import DateInlineKeyboard, DateCallbackFactory, ObjectInlineKeyboard, \
+    ObjectCallbackFactory, \
     CategoryInlineKeyboard, CategoryCallbackFactory, TypeInlineKeyboard, TypeCallbackFactory, PaginationCallbackFactory
 
 router = Router()
@@ -157,7 +158,7 @@ async def report_value_input(message: Message,
         messages.append(await info_about_choices(message, state, bot))
         messages.append(await bot.send_message(message.from_user.id,
                                                text="Подтверждаете введённые данные? (да/нет)",
-                                               reply_markup=main_kb.yes_or_no_kb
+                                               reply_markup=keyboards.yes_or_no_kb
                                                ))
         [await cleaner.add(message.message_id) for message in messages]
         await state.set_state(ReportState.confirmation)
@@ -175,12 +176,12 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot, cle
             await info_about_choices(message, state, bot)
             await bot.send_message(message.from_user.id,
                                    text="🏆Отчёт успешно добавлен, продолжим?🏆",
-                                   reply_markup=main_kb.yes_or_no_kb)
+                                   reply_markup=keyboards.yes_or_no_kb)
             await state.set_state(ReportState.need_to_add_more)
         else:
             messages.append(await bot.send_message(message.from_user.id,
                                                    text="😕Отчёт не прошёл, повторите пожалуйста занова😕",
-                                                   reply_markup=main_kb.main_kb
+                                                   reply_markup=keyboards.main_kb
                                                    ))
             await state.clear()
 
@@ -211,7 +212,7 @@ async def add_more(message: Message, bot: Bot, state: FSMContext, cleaner: Clean
         await bot.send_message(message.from_user.id,
                                text=f'Спасибо большое, скоро вам придёт ексель файл'
                                     f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
-                               reply_markup=main_kb.main_kb)
+                               reply_markup=keyboards.main_kb)
         # TODO добавить здесь отправку ексель файла юзеру
         await state.clear()
 

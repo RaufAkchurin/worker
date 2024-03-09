@@ -4,21 +4,23 @@ import asyncio
 
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import CommandStart
-from telegram.registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
+
+from telegram import keyboards
+from registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
-from telegram.report.report_kb import DateInlineKeyboard
+from report.report_kb import DateInlineKeyboard
 import os
 from dotenv import load_dotenv
 
-from telegram.cleaner.cleaner import Cleaner
-from telegram.cleaner.cleaner_middleware import CleanerMiddleware
+from cleaner.cleaner import Cleaner
+from cleaner.cleaner_middleware import CleanerMiddleware
 
 from aiogram import Bot
 from aiogram.types import Message
 
 from API import get_worker_by_telegram
-from telegram.report import hendlers
-from telegram.report.hendlers import report_value_input, ReportState, report_confirmation, add_more
+from report import hendlers
+from report.hendlers import report_value_input, ReportState, report_confirmation, add_more
 
 load_dotenv()
 router = Router()
@@ -41,10 +43,10 @@ async def start(message: Message, bot: Bot):
     if get_worker_by_telegram(message.from_user.id):
         await bot.send_message(message.from_user.id, text=f"Привет, бот запустился \n" \
                                                           "Перезапустить бота - /start"
-                               , reply_markup=bot_kb.main_kb)
+                               , reply_markup=keyboards.main_kb)
     else:
         await bot.send_message(message.from_user.id, text="Пожалуйста пройдите регистрацию.",
-                               reply_markup=bot_kb.main_kb)
+                               reply_markup=keyboards.main_kb)
 
 
 @router.message()
@@ -61,7 +63,7 @@ async def echo(message: Message, cleaner):
                                                       " вам необходимо пройти регистрацию. ⚠️"))
 
     elif msg == "перезагрузить бота":
-        await message.answer(text="Вы перешли в главное меню!", reply_markup=bot_kb.main_kb)
+        await message.answer(text="Вы перешли в главное меню!", reply_markup=keyboards.main_kb)
 
     [await cleaner.add(message.message_id) for message in messages]
 
