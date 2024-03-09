@@ -53,7 +53,18 @@ class MeasurementSerializer(serializers.ModelSerializer):
         )
 
 
-class WorkTypeSerializer(serializers.ModelSerializer):
+class ShiftCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shift
+        fields = (
+            "worker",
+            "date",
+            "work_type",
+            "value",
+        )
+
+
+class WorkTypeViewSerializer(serializers.ModelSerializer):
     measurement = MeasurementSerializer(source="measurement_type")
 
     class Meta:
@@ -65,12 +76,12 @@ class WorkTypeSerializer(serializers.ModelSerializer):
         )
 
 
-class ShiftCreationSerializer(serializers.ModelSerializer):
+class WorkTypeCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Shift
+        model = WorkType
         fields = (
-            "worker",
-            "date",
-            "work_type",
-            "value",
+            "category",
+            "name",
+            "measurement_type",
+            "created_by"
         )

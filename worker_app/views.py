@@ -2,7 +2,8 @@ from rest_framework import viewsets, generics
 from rest_framework.pagination import PageNumberPagination
 
 from worker_app.models import Category, Worker
-from worker_app.serializers import ObjectSerializer, WorkTypeSerializer, WorkerSerializer, CategorySerializer
+from worker_app.serializers import ObjectSerializer, WorkTypeViewSerializer, WorkerSerializer, CategorySerializer, \
+    WorkTypeCreateSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,9 +11,28 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views import View
 from .models import Object, WorkType
-from .serializers import WorkerRegistrationSerializer, ShiftCreationSerializer
+from .serializers import WorkerRegistrationSerializer, ShiftCreateSerializer
 
 
+class CustomPageNumberPagination(PageNumberPagination):
+    def get_paginated_response(self, data):
+        next_url = self.get_next_link()
+        prev_url = self.get_previous_link()
+
+        # Cut base URL
+        base_url = self.request.build_absolute_uri('/')
+        next_url_cut = next_url.replace(base_url, '') if next_url else None
+        prev_url_cut = prev_url.replace(base_url, '') if prev_url else None
+
+        return Response({
+            'count': self.page.paginator.count,
+            'next': next_url_cut,
+            'previous': prev_url_cut,
+            'results': data
+        })
+
+
+# WORKER VIEWS
 class WorkerListViewSet(viewsets.ModelViewSet):
     serializer_class = WorkerSerializer
     queryset = Worker.objects.all()
@@ -45,6 +65,7 @@ class WorkerRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# WORK TYPES VIEWS
 class WorkTypesByObjectView(View):
     def get(self, request, object_id):
         # Get the object or return a 404 error if not found
@@ -65,22 +86,34 @@ class WorkTypesByObjectView(View):
         return JsonResponse({'work_types': work_types_data})
 
 
-class CustomPageNumberPagination(PageNumberPagination):
-    def get_paginated_response(self, data):
-        next_url = self.get_next_link()
-        prev_url = self.get_previous_link()
+class WorkTypeListByCategory(generics.ListAPIView):
+    serializer_class = WorkTypeViewSerializer
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 10
 
-        # Cut base URL
-        base_url = self.request.build_absolute_uri('/')
-        next_url_cut = next_url.replace(base_url, '') if next_url else None
-        prev_url_cut = prev_url.replace(base_url, '') if prev_url else None
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return WorkType.objects.filter(category__id=category_id)
 
-        return Response({
-            'count': self.page.paginator.count,
-            'next': next_url_cut,
-            'previous': prev_url_cut,
-            'results': data
-        })
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class WorkTypesCreateView(APIView):
+    def post(self, request):
+        serializer = WorkTypeCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ObjectListViewSet(viewsets.ModelViewSet):
@@ -128,30 +161,9 @@ class CategoryListView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class WorkTypeListByCategory(generics.ListAPIView):
-    serializer_class = WorkTypeSerializer
-    pagination_class = CustomPageNumberPagination
-    pagination_class.page_size = 10
-
-    def get_queryset(self):
-        category_id = self.kwargs['category_id']
-        return WorkType.objects.filter(category__id=category_id)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 class ShiftCreationView(APIView):
     def post(self, request):
-        serializer = ShiftCreationSerializer(data=request.data)
+        serializer = ShiftCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
