@@ -1,23 +1,16 @@
 import math
 import os
-
-from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-
 from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
     get_work_type_list_by_category_id, get_work_type_list_by_paginated_url, get_object_by_paginated_url, \
     get_category_list_by_paginated_url
 from datetime import datetime, timedelta
-
-from telegram.report.new_work_type.hendlers import new_work_type_bottom_adding
+from telegram.report.factory import ObjectCallbackFactory, CategoryCallbackFactory, TypeCallbackFactory, \
+    DateCallbackFactory, PaginationCallbackFactory
+from telegram.report.new_work_type.utils import new_work_type_bottom_adding
 
 localhost = os.getenv('LOCALHOST_IP')
-
-
-class ObjectCallbackFactory(CallbackData, prefix="object"):
-    id: str
-    name: str
 
 
 def ObjectInlineKeyboard(url: str = None):
@@ -44,10 +37,6 @@ def ObjectInlineKeyboard(url: str = None):
 
 # CATEGORY ITEMS
 
-class CategoryCallbackFactory(CallbackData, prefix="category"):
-    id: str
-    name: str
-
 
 def CategoryInlineKeyboard(object_id, url=None):
     if url:
@@ -72,11 +61,6 @@ def CategoryInlineKeyboard(object_id, url=None):
 
 
 # TYPE ITEMS
-
-class TypeCallbackFactory(CallbackData, prefix="type"):
-    id: str
-    name: str
-    measurement: str
 
 
 def TypeInlineKeyboard(category_id, url=None):
@@ -104,9 +88,6 @@ def TypeInlineKeyboard(category_id, url=None):
 
 
 # DATE ITEMS
-
-class DateCallbackFactory(CallbackData, prefix="date"):
-    date: str
 
 
 def date_buttons_text_generator():
@@ -146,10 +127,6 @@ def DateInlineKeyboard():
 
 
 # PAGINATION ITEMS
-
-class PaginationCallbackFactory(CallbackData, prefix="pagination"):
-    url: str
-    action: str
 
 
 def pagination_bottoms_adding(query_from_api, inline_keyboard):

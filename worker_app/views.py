@@ -1,9 +1,9 @@
 from rest_framework import viewsets, generics
 from rest_framework.pagination import PageNumberPagination
 
-from worker_app.models import Category, Worker
+from worker_app.models import Category, Worker, Measurement
 from worker_app.serializers import ObjectSerializer, WorkTypeViewSerializer, WorkerSerializer, CategorySerializer, \
-    WorkTypeCreateSerializer
+    WorkTypeCreateSerializer, MeasurementSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -148,6 +148,45 @@ class CategoryListView(viewsets.ModelViewSet):
             return categories
         except Object.DoesNotExist:
             return Category.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class WorkTypeListByCategory(generics.ListAPIView):
+    serializer_class = WorkTypeViewSerializer
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 10
+
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        return WorkType.objects.filter(category__id=category_id)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class MeasurementListViewSet(viewsets.ModelViewSet):
+    serializer_class = MeasurementSerializer
+    queryset = Measurement.objects.all()
+    pagination_class = CustomPageNumberPagination
+    pagination_class.page_size = 10
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

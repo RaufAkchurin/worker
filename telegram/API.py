@@ -11,18 +11,6 @@ load_dotenv()
 BASE_URL = 'http://' + os.getenv('LOCALHOST_IP') + '/api/v1'
 
 
-# OBJECT
-def get_object_list():
-    url = f"{BASE_URL}/objects"
-    response = requests.get(url=url)
-    return response.json()
-
-
-def get_object_by_paginated_url(url):
-    response = requests.get(url=url)
-    return response.json()
-
-
 # WORKER
 def get_worker_list():
     url = f"{BASE_URL}/workers"
@@ -52,6 +40,18 @@ def post_worker_registration(name, surname, telephone, telegram_id):
         return True
     else:
         return False
+
+
+# OBJECT
+def get_object_list():
+    url = f"{BASE_URL}/objects"
+    response = requests.get(url=url)
+    return response.json()
+
+
+def get_object_by_paginated_url(url):
+    response = requests.get(url=url)
+    return response.json()
 
 
 # CATEGORY
@@ -104,6 +104,14 @@ async def post_work_type_create(category, name, measurement_type, created_by, bo
                                    reply_markup=keyboards.main_kb)
     else:
         return False
+
+
+# MEASUREMENT
+
+def get_measurement_list():
+    url = f"{BASE_URL}/measurement"
+    response = requests.get(url=url)
+    return response.json()
 
 
 # SHIFT

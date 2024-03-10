@@ -4,7 +4,7 @@ from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, \
     WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView, WorkTypeListByCategory, \
-    WorkTypesCreateView
+    WorkTypesCreateView, MeasurementListViewSet
 
 urlpatterns = [
     # WORKERS
@@ -20,6 +20,9 @@ urlpatterns = [
     path('work_types/object/<int:object_id>/', WorkTypesByObjectView.as_view(), name='work_types_by_object'),
     path('work_types/category/<int:category_id>/', WorkTypeListByCategory.as_view(), name='work_types_by_category'),
     path("work_types/create", WorkTypesCreateView.as_view(), name="work_types_create"),
+
+    # MEASUREMENT
+    path("measurements", MeasurementListViewSet.as_view({'get': 'list', }), name="measurements", ),
 
     #  REPORTS
     path('report_customer/<int:object_id>/', ReportCustomerView.as_view(), name='report_customer'),

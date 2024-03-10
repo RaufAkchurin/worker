@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton
 
-from telegram.report.report_kb import PaginationCallbackFactory
+from telegram.report.factory import PaginationCallbackFactory
 
 
 def new_work_type_bottom_adding(query_from_api, inline_keyboard):
