@@ -20,7 +20,7 @@ from aiogram.types import Message
 
 from API import get_worker_by_telegram
 from report.hendlers import report_value_input, ReportState, report_confirmation, add_more
-from telegram.report.new_work_type.hendlers import new_type_hendler, NewTypeState
+from telegram.report.new_work_type.hendlers import new_type_name_hendler, NewTypeState
 
 load_dotenv()
 router = Router()
@@ -38,9 +38,7 @@ router.message.register(report_confirmation, ReportState.confirmation)
 router.message.register(add_more, ReportState.need_to_add_more)
 
 # Регистрируем хендлеры добавления нового типа работ
-
-router.message.register(new_type_hendler, NewTypeState.name_input)
-
+router.message.register(new_type_name_hendler, NewTypeState.name_input)
 
 @router.message(CommandStart())
 async def start(message: Message, bot: Bot):

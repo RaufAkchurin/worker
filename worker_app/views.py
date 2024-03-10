@@ -184,7 +184,7 @@ class WorkTypeListByCategory(generics.ListAPIView):
 
 class MeasurementListViewSet(viewsets.ModelViewSet):
     serializer_class = MeasurementSerializer
-    queryset = Measurement.objects.all()
+    queryset = Measurement.objects.all().order_by('id')
     pagination_class = CustomPageNumberPagination
     pagination_class.page_size = 10
 

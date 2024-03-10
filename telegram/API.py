@@ -84,13 +84,13 @@ def get_work_type_list_by_object_id(object_id):
     return response.json()["work_types"]
 
 
-async def post_work_type_create(category, name, measurement_type, created_by, bot: Bot, worker_tg):
+async def post_work_type_create(category, name, measurement, created_by, bot: Bot, worker_tg):
     url = f"{BASE_URL}/work_types/create"
     data = {
         "category": category,
         "name": name,
-        "measurement_type": measurement_type,
-        "created_by": created_by
+        "measurement": measurement,
+        "created_by": created_by,
     }
     response = requests.post(url, data)
     if response.status_code == 201:
@@ -102,6 +102,11 @@ async def post_work_type_create(category, name, measurement_type, created_by, bo
             await bot.send_message(worker_tg,
                                    text="⚠️Тип работ с данным названием для данной категории уже существует⚠️",
                                    reply_markup=keyboards.main_kb)
+        else:
+            await bot.send_message(worker_tg,
+                                   text="⚠️Обратитесь к разработчику⚠️"
+                                        f"ошибка - {response.json()}",
+                                   reply_markup=keyboards.main_kb)
     else:
         return False
 
@@ -109,7 +114,7 @@ async def post_work_type_create(category, name, measurement_type, created_by, bo
 # MEASUREMENT
 
 def get_measurement_list():
-    url = f"{BASE_URL}/measurement"
+    url = f"{BASE_URL}/measurements"
     response = requests.get(url=url)
     return response.json()
 

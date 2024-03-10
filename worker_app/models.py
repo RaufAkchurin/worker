@@ -58,7 +58,7 @@ class WorkType(models.Model):
     price_for_worker = models.IntegerField(verbose_name='Цена для рабочих', default=0)
     price_for_customer = models.IntegerField(verbose_name='Цена для заказчика', default=0)
     total_scope = models.IntegerField(verbose_name='Общий объём', default=0)
-    measurement_type = models.ForeignKey(Measurement, on_delete=models.CASCADE, verbose_name='Ед.изм.')
+    measurement = models.ForeignKey(Measurement, on_delete=models.CASCADE, verbose_name='Ед.изм.')
     created_by = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Автор', default=18)
 
     class Meta:

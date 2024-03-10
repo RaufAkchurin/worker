@@ -81,7 +81,7 @@ class ReportWorkerView(View):
                     total_price = total_scope * price_for_worker
 
                     worksheet.cell(row=row_num, column=1, value=work_type.name)
-                    worksheet.cell(row=row_num, column=2, value=work_type.measurement_type.name).alignment = Alignment(
+                    worksheet.cell(row=row_num, column=2, value=work_type.measurement.name).alignment = Alignment(
                         horizontal='center')
                     worksheet.cell(row=row_num, column=3, value=total_scope).alignment = Alignment(horizontal='center')
                     worksheet.cell(row=row_num, column=4, value=price_for_worker)
