@@ -10,6 +10,8 @@ from API import get_object_list, get_category_list_by_object_id, get_work_type_l
     get_category_list_by_paginated_url
 from datetime import datetime, timedelta
 
+from telegram.report.new_work_type.hendlers import new_work_type_bottom_adding
+
 localhost = os.getenv('LOCALHOST_IP')
 
 
@@ -35,7 +37,7 @@ def ObjectInlineKeyboard(url: str = None):
                     name=object["name"][:20]
                 ).pack()
             )])
-    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = pagination_bottoms_adding(query_from_api, inline_keyboard)
     object_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return object_inline_markup
 
@@ -64,7 +66,7 @@ def CategoryInlineKeyboard(object_id, url=None):
                     action="change_category"
                 ).pack()
             )])
-    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = pagination_bottoms_adding(query_from_api, inline_keyboard)
     category_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return category_inline_markup
 
@@ -95,7 +97,8 @@ def TypeInlineKeyboard(category_id, url=None):
                 ).pack()
             )])
 
-    inline_keyboard = add_pagination_bottoms(query_from_api, inline_keyboard)
+    inline_keyboard = new_work_type_bottom_adding(query_from_api, inline_keyboard)
+    inline_keyboard = pagination_bottoms_adding(query_from_api, inline_keyboard)
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
     return type_inline_markup
 
@@ -149,7 +152,7 @@ class PaginationCallbackFactory(CallbackData, prefix="pagination"):
     action: str
 
 
-def add_pagination_bottoms(query_from_api, inline_keyboard):
+def pagination_bottoms_adding(query_from_api, inline_keyboard):
     try:
         pages_count = math.ceil(query_from_api["count"] / 10)
         if query_from_api["next"]:
