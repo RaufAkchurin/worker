@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
 from telegram.API import get_measurement_list
 from telegram.report.new_work_type.factory import MeasurementCallbackFactory
 from telegram.report.report_kb import pagination_bottoms_adding
