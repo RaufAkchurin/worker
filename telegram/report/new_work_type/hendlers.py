@@ -1,14 +1,12 @@
 from aiogram import Router, types, F, Bot
-from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import CallbackQuery
-from aiogram.types import Message
 from telegram.API import post_work_type_create, get_worker_by_telegram
 from telegram.cleaner.cleaner import Cleaner
 from telegram.report.new_work_type.factory import MeasurementCallbackFactory
 from telegram.report.new_work_type.keyboards import MeasurementInlineKeyboard
-from telegram.report.report_kb import PaginationCallbackFactory, ObjectInlineKeyboard
+from telegram.report.report_kb import PaginationCallbackFactory, TypeInlineKeyboard
 
 router = Router()
 
@@ -30,29 +28,35 @@ async def new_type_name_input(callback: CallbackQuery,
 
 async def new_type_name_hendler(message: types.Message, cleaner: Cleaner, state: FSMContext):
     await state.update_data(new_type_name=message.text)
-    await state.update_data(new_type_name=message.text)
     msg = await message.answer(text="Теперь выберите еденицу измерения",
                                reply_markup=MeasurementInlineKeyboard())
     await cleaner.add(msg.message_id)
 
 
 @router.callback_query(MeasurementCallbackFactory.filter())
-async def new_type_measurement_choice(callback: MeasurementCallbackFactory,
+async def new_type_measurement_choice(callback: CallbackQuery,
+                                      callback_data: MeasurementCallbackFactory,
                                       state: FSMContext,
-                                      bot: Bot, ):
-    await state.update_data(new_type_measurement_id=callback.id)
-
-    # Fetching data
+                                      bot: Bot,
+                                      cleaner: Cleaner):
+    await state.update_data(new_type_measurement_id=callback_data.id)
     data = await state.get_data()
-    created_by = get_worker_by_telegram(callback.from_user.id)["worker"]
-    selected_category_id = data['selected_category_id']
-    new_type_measurement_id = data['new_type_measurement_id']
 
-    print(await post_work_type_create(
-        name=callback.id,
-        category=selected_category_id,
-        measurement=new_type_measurement_id,
-        created_by=created_by["id"],
+    created = await post_work_type_create(
+        name=data["new_type_name"],
+        category=data['selected_category_id'],
+        measurement=data['new_type_measurement_id'],
+        created_by=get_worker_by_telegram(callback.from_user.id)["worker"],
         worker_tg=callback.from_user.id,
         bot=bot,
-    ))
+    )
+
+    if created:
+        msg = await callback.bot.send_message(callback.message.chat.id,
+                                              text="🏆Новый тип добавлен, можно перейти к отчёту🏆",
+                                              reply_markup=TypeInlineKeyboard(category_id=data['selected_category_id']))
+    else:
+        msg = await callback.bot.send_message(callback.message.chat.id,
+                                              text="😕Не удалось добавить новый тип работ.😕")
+    await cleaner.add(msg.message_id)
+    await state.clear()

@@ -1,23 +1,18 @@
 import logging
 import sys
 import asyncio
-
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import CommandStart
-
 from telegram import keyboards, report
 from registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
     register_confirmation
 from report.report_kb import DateInlineKeyboard
 import os
 from dotenv import load_dotenv
-
 from cleaner.cleaner import Cleaner
 from cleaner.cleaner_middleware import CleanerMiddleware
-
 from aiogram import Bot
 from aiogram.types import Message
-
 from API import get_worker_by_telegram
 from report.hendlers import report_value_input, ReportState, report_confirmation, add_more
 from telegram.report.new_work_type.hendlers import new_type_name_hendler, NewTypeState
@@ -39,6 +34,7 @@ router.message.register(add_more, ReportState.need_to_add_more)
 
 # Регистрируем хендлеры добавления нового типа работ
 router.message.register(new_type_name_hendler, NewTypeState.name_input)
+
 
 @router.message(CommandStart())
 async def start(message: Message, bot: Bot):

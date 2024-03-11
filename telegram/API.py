@@ -105,7 +105,7 @@ async def post_work_type_create(category, name, measurement, created_by, bot: Bo
         else:
             await bot.send_message(worker_tg,
                                    text="⚠️Обратитесь к разработчику⚠️"
-                                        f"ошибка - {response.json()}",
+                                        f"\n ошибка - {response.json()}",
                                    reply_markup=keyboards.main_kb)
     else:
         return False

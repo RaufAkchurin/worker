@@ -65,7 +65,7 @@ class WorkType(models.Model):
         ordering = ['id']
         verbose_name = 'Тип работ'
         verbose_name_plural = 'Типы работ'
-        unique_together = [['category', 'name']]
+        unique_together = ('category', 'name')
 
     def __str__(self):
         return self.name

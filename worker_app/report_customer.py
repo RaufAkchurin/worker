@@ -24,7 +24,7 @@ class ReportCustomerView(View):
         ).values(
             'name',
             'category__name',  # Include the category name for grouping
-            'measurement_type__name',
+            'measurement__name',
             'total_scope',
             'сумма',
         )
@@ -50,7 +50,7 @@ class ReportCustomerView(View):
         merged_df = merged_df.rename(columns={
             'name': 'Наименование работ',
             'category__name': 'Категория',  # Rename the category column
-            'measurement_type__name': 'ед.изм.',
+            'measurement__name': 'ед.изм.',
             'total_scope': 'кол-во',
             'price_for_customer': 'цена',
             'quantity_shift': 'кол-во факт',
