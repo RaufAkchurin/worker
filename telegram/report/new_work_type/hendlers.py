@@ -77,7 +77,6 @@ async def new_type_create_confirmation(message: types.Message,
         else:
             msg = await message.answer(text="😕Не удалось добавить новый тип работ.😕")
         await cleaner.add(msg.message_id)
-        await state.clear()
 
     else:
         await message.answer(text="Введите название нового типа работ")
