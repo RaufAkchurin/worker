@@ -4,18 +4,20 @@ import asyncio
 from aiogram import Dispatcher, F, Router
 from aiogram.filters import CommandStart
 from telegram import keyboards, report
-from registration.registartion import RegisterState, register_start, register_name, register_phone, register_surname, \
-    register_confirmation
-from report.report_kb import DateInlineKeyboard
+
 import os
 from dotenv import load_dotenv
-from cleaner.cleaner import Cleaner
-from cleaner.cleaner_middleware import CleanerMiddleware
 from aiogram import Bot
 from aiogram.types import Message
-from API import get_worker_by_telegram
-from report.hendlers import report_value_input, ReportState, report_confirmation, report_add_more
+
+from telegram.API import get_worker_by_telegram
+from telegram.cleaner.cleaner import Cleaner
+from telegram.cleaner.cleaner_middleware import CleanerMiddleware
+from telegram.registration.registartion import register_start, register_name, register_surname, register_phone, \
+    register_confirmation, RegisterState
+from telegram.report.hendlers import report_value_input, report_confirmation, report_add_more, ReportState
 from telegram.report.new_work_type.hendlers import new_type_name_measurement, NewTypeState, new_type_create_confirmation
+from telegram.report.report_kb import DateInlineKeyboard
 
 load_dotenv()
 router = Router()

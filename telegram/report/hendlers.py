@@ -6,11 +6,12 @@ from aiogram.enums import ParseMode
 from magic_filter import F
 
 from telegram import keyboards
-from API import get_worker_by_telegram, post_shift_creation
-from cleaner.cleaner import Cleaner
-from report.report_kb import DateInlineKeyboard, DateCallbackFactory, ObjectInlineKeyboard, \
-    ObjectCallbackFactory, \
-    CategoryInlineKeyboard, CategoryCallbackFactory, TypeInlineKeyboard, TypeCallbackFactory, PaginationCallbackFactory
+from telegram.API import get_worker_by_telegram, post_shift_creation
+from telegram.cleaner.cleaner import Cleaner
+from telegram.report.factory import DateCallbackFactory, ObjectCallbackFactory, CategoryCallbackFactory, \
+    TypeCallbackFactory, PaginationCallbackFactory
+from telegram.report.report_kb import ObjectInlineKeyboard, CategoryInlineKeyboard, TypeInlineKeyboard, \
+    DateInlineKeyboard
 
 router = Router()
 

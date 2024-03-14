@@ -1,14 +1,13 @@
 import math
 import os
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from API import get_object_list, get_category_list_by_object_id, get_work_type_list_by_object_id, \
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from telegram.API import get_object_list, get_category_list_by_object_id, \
     get_work_type_list_by_category_id, get_work_type_list_by_paginated_url, get_object_by_paginated_url, \
     get_category_list_by_paginated_url
 from datetime import datetime, timedelta
 from telegram.report.factory import ObjectCallbackFactory, CategoryCallbackFactory, TypeCallbackFactory, \
     DateCallbackFactory, PaginationCallbackFactory
-from telegram.report.new_work_type.utils import new_work_type_bottom_adding
 
 localhost = os.getenv('LOCALHOST_IP')
 
@@ -81,6 +80,7 @@ def TypeInlineKeyboard(category_id, url=None):
                 ).pack()
             )])
 
+    from telegram.report.new_work_type.utils import new_work_type_bottom_adding
     inline_keyboard = new_work_type_bottom_adding(query_from_api, inline_keyboard)
     inline_keyboard = pagination_bottoms_adding(query_from_api, inline_keyboard)
     type_inline_markup = InlineKeyboardMarkup(inline_keyboard=inline_keyboard)

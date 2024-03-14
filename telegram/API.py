@@ -4,7 +4,7 @@ import requests
 from aiogram import Bot
 from dotenv import load_dotenv
 
-import keyboards
+from telegram import keyboards
 
 load_dotenv()
 

@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
-from API import get_worker_by_telegram, post_worker_registration
+from telegram.API import get_worker_by_telegram, post_worker_registration
 
 
 class RegisterState(StatesGroup):
