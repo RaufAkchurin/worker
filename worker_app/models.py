@@ -55,15 +55,17 @@ class WorkType(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория')
     name = models.CharField(max_length=255, verbose_name='Название')
 
-    price_for_worker = models.IntegerField(verbose_name='Цена для рабочих')
-    price_for_customer = models.IntegerField(verbose_name='Цена для заказчика')
-    total_scope = models.IntegerField(verbose_name='Общий объём')
-    measurement_type = models.ForeignKey(Measurement, on_delete=models.CASCADE, verbose_name='Ед.изм.')
+    price_for_worker = models.IntegerField(verbose_name='Цена для рабочих', default=0)
+    price_for_customer = models.IntegerField(verbose_name='Цена для заказчика', default=0)
+    total_scope = models.IntegerField(verbose_name='Общий объём', default=0)
+    measurement = models.ForeignKey(Measurement, on_delete=models.CASCADE, verbose_name='Ед.изм.')
+    created_by = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Автор', default=18)
 
     class Meta:
         ordering = ['id']
         verbose_name = 'Тип работ'
         verbose_name_plural = 'Типы работ'
+        unique_together = ('category', 'name')
 
     def __str__(self):
         return self.name

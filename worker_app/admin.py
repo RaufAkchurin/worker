@@ -70,7 +70,7 @@ class WorkTypeAdmin(admin.ModelAdmin):
     raw_id_fields = ("category",)
     list_filter = ("category",)
     search_fields = ("name",)
-    list_display = ("category", "name", "price_for_worker", "price_for_customer", "total_scope", "measurement_type",)
+    list_display = ("category", "name", "price_for_worker", "price_for_customer", "total_scope", "measurement",)
 
 
 class ShiftAdmin(admin.ModelAdmin):
