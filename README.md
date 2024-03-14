@@ -171,7 +171,7 @@ PartOf=django_app.service
 [Service]
 Type=simple
 WorkingDirectory=/root/worker
-ExecStart=/root/worker/venv/bin/python3 /root/worker/telegram/bot.py
+ExecStart=/root/worker/venv/bin/python3 /root/worker/bot.py
 KillMode=process
 Restart=always
 RestartSec=10
