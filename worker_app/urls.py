@@ -2,9 +2,10 @@ from django.urls import path
 
 from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
-from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, \
-    WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView, WorkTypeListByCategory, \
-    WorkTypesCreateView, MeasurementListViewSet, LogCreationView
+from worker_app.views.views import ObjectListViewSet, CategoryListView, MeasurementListViewSet, ShiftCreationView, \
+    LogCreationView
+from worker_app.views.work_type import WorkTypesByObjectView, WorkTypeListByCategory, WorkTypesCreateView
+from worker_app.views.worker import WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView
 
 urlpatterns = [
     # WORKERS
