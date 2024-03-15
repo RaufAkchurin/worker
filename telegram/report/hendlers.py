@@ -178,7 +178,6 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot, cle
 async def report_add_more(message: Message, bot: Bot, state: FSMContext, cleaner: Cleaner) -> None:
     messages = [message, ]
     data = await state.get_data()
-    selected_object_id = data.get("selected_object_id")
     selected_category_id = data.get("selected_category_id")
     if message.text == "да":
         await state.set_state(ReportState.type_choice)

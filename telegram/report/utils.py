@@ -1,3 +1,5 @@
+import os
+
 from aiogram import Router, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -12,6 +14,7 @@ from telegram.report.factory import DateCallbackFactory, ObjectCallbackFactory, 
     TypeCallbackFactory, PaginationCallbackFactory
 from telegram.report.report_kb import ObjectInlineKeyboard, CategoryInlineKeyboard, TypeInlineKeyboard, \
     DateInlineKeyboard
+from aiogram.types import FSInputFile
 
 
 async def get_report_worker_individual(message: Message, state: FSMContext, bot: Bot):
@@ -21,8 +24,12 @@ async def get_report_worker_individual(message: Message, state: FSMContext, bot:
 
     updated_report = await get_report_individual(object_id=selected_object_id, worker_id=worker_id)
     if updated_report:
-        from aiogram.types import FSInputFile
-        excel_file = FSInputFile("/home/rauf/PycharmProjects/worker/report_worker.xlsx")
+        # generate file path
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        two_levels_up = os.path.normpath(os.path.join(current_directory, '../../'))
+        excel_file_relative_path = os.path.join(two_levels_up, "report_worker.xlsx")
+
+        excel_file = FSInputFile(excel_file_relative_path)
         await bot.send_document(
             message.from_user.id,
             document=excel_file,
