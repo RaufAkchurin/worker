@@ -18,21 +18,13 @@ class WorkerRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Worker
-        fields = (
-            "name",
-            "surname",
-            "telephone",
-            "telegram_id"
-        )
+        fields = "__all__"
 
 
 class ObjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Object
-        fields = (
-            "id",
-            "name",
-        )
+        fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -47,31 +39,19 @@ class CategorySerializer(serializers.ModelSerializer):
 class MeasurementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Measurement
-        fields = (
-            "id",
-            "name",
-        )
+        fields = '__all__'
 
 
 class ShiftCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
-        fields = (
-            "worker",
-            "date",
-            "work_type",
-            "value",
-        )
+        fields = "__all__"
 
 
 class LogCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Log
-        fields = (
-            "func",
-            "description",
-            "created_at",
-        )
+        fields = "__all__"
 
 
 class WorkTypeViewSerializer(serializers.ModelSerializer):
