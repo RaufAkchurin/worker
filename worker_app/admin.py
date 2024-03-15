@@ -40,7 +40,7 @@ class ObjectAdmin(admin.ModelAdmin):
         selected_id = queryset.values_list('id', flat=False)
 
         # Отправляем запрос на ваше API, передавая айди объектов
-        response = requests.get(f"http://{LOCALHOST_IP}/api/v1/report_worker/{selected_id[0][0]}/")
+        response = requests.get(f"http://{LOCALHOST_IP}/api/v1/report_worker_general/{selected_id[0][0]}/")
 
         # Проверяем успешность запроса
         if response.status_code == 200:

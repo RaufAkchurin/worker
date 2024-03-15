@@ -6,7 +6,7 @@ from aiogram.enums import ParseMode
 from magic_filter import F
 
 from telegram import keyboards
-from telegram.API import get_worker_by_telegram, post_shift_creation
+from telegram.API import get_worker_by_telegram, post_shift_creation, get_report_individual
 from telegram.cleaner.cleaner import Cleaner
 from telegram.report.factory import DateCallbackFactory, ObjectCallbackFactory, CategoryCallbackFactory, \
     TypeCallbackFactory, PaginationCallbackFactory
@@ -177,6 +177,7 @@ async def report_confirmation(message: Message, state: FSMContext, bot: Bot, cle
 async def report_add_more(message: Message, bot: Bot, state: FSMContext, cleaner: Cleaner) -> None:
     messages = [message, ]
     data = await state.get_data()
+    selected_object_id = data.get("selected_object_id")
     selected_category_id = data.get("selected_category_id")
     if message.text == "да":
         await state.set_state(ReportState.type_choice)
@@ -190,7 +191,17 @@ async def report_add_more(message: Message, bot: Bot, state: FSMContext, cleaner
                                text=f'Спасибо большое, скоро вам придёт ексель файл'
                                     f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
                                reply_markup=keyboards.main_kb)
-        # TODO добавить здесь отправку ексель файла юзеру
+
+        #  Excel report sending
+        worker_id = get_worker_by_telegram(message.from_user.id)
+        updated_report = get_report_individual(object_id=int(selected_object_id), worker_id=worker_id["worker"]["id"])
+        if updated_report:
+            from aiogram.types import FSInputFile
+            excel_file = FSInputFile("/home/rauf/PycharmProjects/worker/report_worker.xlsx")
+            await bot.send_document(
+                message.from_user.id,
+                document=excel_file,
+            )
         await state.clear()
 
     [await cleaner.add(m.message_id) for m in messages]

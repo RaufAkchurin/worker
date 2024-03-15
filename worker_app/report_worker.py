@@ -13,6 +13,7 @@ from worker_app.models import Object, Shift, WorkType, WorkersBenefits, Travel, 
 class ReportWorkerView(View):
     def get(self, request, *args, **kwargs):
         object_id = kwargs.get("object_id", None)
+        worker_id = kwargs.get("worker_id", None)
 
         # Получаем объект
         selected_object = Object.objects.filter(id=object_id).first()
@@ -22,15 +23,19 @@ class ReportWorkerView(View):
         shifts = Shift.objects.filter(work_type__in=work_types)
 
         if not shifts.count():
-            return HttpResponse({'Для данного объекта не обнаружено ни одной смены'}, status=status.HTTP_404_NOT_FOUND)
+            return HttpResponse({'Для данного объекта строительства не обнаружено ни одной смены'}, status=status.HTTP_404_NOT_FOUND)
 
         # Получаем все командировки для данного объекта
         travels = Travel.objects.filter(object=selected_object)
 
         # Получаем список всех работников
-        workers_from_travels = {travel.worker for travel in travels}
-        workers_from_shifts = {shift.worker for shift in shifts}
-        workers = workers_from_travels.union(workers_from_shifts)
+
+        if worker_id is None:
+            workers_from_travels = {travel.worker for travel in travels}
+            workers_from_shifts = {shift.worker for shift in shifts}
+            workers = workers_from_travels.union(workers_from_shifts)
+        else:
+            workers = [Worker.objects.filter(id=worker_id).last()]
 
         # Создаем новый Excel файл
         workbook = Workbook()

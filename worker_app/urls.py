@@ -26,7 +26,8 @@ urlpatterns = [
 
     #  REPORTS
     path('report_customer/<int:object_id>/', ReportCustomerView.as_view(), name='report_customer'),
-    path('report_worker/<int:object_id>/', ReportWorkerView.as_view(), name='report_worker'),
+    path('report_worker_general/<int:object_id>/', ReportWorkerView.as_view(), name='report_worker_general'),
+    path('report_worker_individual/<int:object_id>/<int:worker_id>/', ReportWorkerView.as_view(), name='report_worker_individual'),
 
     # SHIFT
     path("shift_creation", ShiftCreationView.as_view(), name="shift_creation"),
