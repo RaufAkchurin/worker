@@ -3,7 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 
 from worker_app.models import Category, Worker, Measurement
 from worker_app.serializers import ObjectSerializer, WorkTypeViewSerializer, WorkerSerializer, CategorySerializer, \
-    WorkTypeCreateSerializer, MeasurementSerializer
+    WorkTypeCreateSerializer, MeasurementSerializer, LogCreateSerializer
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -203,6 +203,15 @@ class MeasurementListViewSet(viewsets.ModelViewSet):
 class ShiftCreationView(APIView):
     def post(self, request):
         serializer = ShiftCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogCreationView(APIView):
+    def post(self, request):
+        serializer = LogCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

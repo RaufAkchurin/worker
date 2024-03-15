@@ -140,3 +140,28 @@ async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, b
                                    reply_markup=keyboards.main_kb)
     else:
         return False
+
+
+# REPORT
+
+async def get_report_individual(object_id: int, worker_id: int):
+    url = f"{BASE_URL}/report_worker_individual/{object_id}/{worker_id}/"
+    response = requests.get(url=url)
+    if response.status_code == 200:
+        return True
+    else:
+        return False
+
+
+async def post_log_create(func: str, description: str):
+    url = f"{BASE_URL}/log_creation/"
+    data = {
+        "func": func,
+        "description": description,
+    }
+
+    response = requests.post(url, data)
+    if response.status_code == 201:
+        return True
+    else:
+        return False
