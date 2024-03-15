@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from rangefilter.filter import DateRangeFilter
 
 from worker_app.models import Worker, Category, WorkType, Object, Shift, Measurement, WorkersBenefits, TravelBenefits, \
-    Travel
+    Travel, Log
 
 load_dotenv()
 
@@ -120,3 +120,5 @@ site.register(WorkersBenefits, WorkersBenefitsAdmin)
 
 site.register(Travel, TravelAdmin)
 site.register(TravelBenefits, TravelBenefitsAdmin)
+
+site.register(Log)

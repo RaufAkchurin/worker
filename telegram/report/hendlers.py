@@ -190,7 +190,8 @@ async def report_add_more(message: Message, bot: Bot, state: FSMContext, cleaner
     else:
         await bot.send_message(message.from_user.id,
                                text=f'Спасибо большое, скоро вам придёт ексель файл'
-                                    f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
+                                    f'\n Для добавления нового отчёта - '
+                                    f'\n нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
                                reply_markup=keyboards.main_kb)
         await get_report_worker_individual(message, state, bot)
         await state.clear()

@@ -128,3 +128,16 @@ class TravelBenefits(models.Model):
 
     def __str__(self):
         return f"Выплата за командировку №{self.pk}"
+
+
+class Log(models.Model):
+    func = models.CharField(max_length=255, verbose_name='Функция где ошибка (def ...)')
+    description = models.CharField(max_length=255, verbose_name='Описание ошибки')
+    created_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Лог'
+        verbose_name_plural = 'Логи'
+
+    def __str__(self):
+        return f"{self.func}, {self.description[:20]}"

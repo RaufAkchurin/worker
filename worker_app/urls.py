@@ -4,7 +4,7 @@ from worker_app.report_customer import ReportCustomerView
 from worker_app.report_worker import ReportWorkerView
 from worker_app.views import ObjectListViewSet, CategoryListView, WorkTypesByObjectView, \
     WorkerListViewSet, WorkerByTelegramIdView, WorkerRegistrationView, ShiftCreationView, WorkTypeListByCategory, \
-    WorkTypesCreateView, MeasurementListViewSet
+    WorkTypesCreateView, MeasurementListViewSet, LogCreationView
 
 urlpatterns = [
     # WORKERS
@@ -31,5 +31,8 @@ urlpatterns = [
 
     # SHIFT
     path("shift_creation", ShiftCreationView.as_view(), name="shift_creation"),
+
+    # LOG
+    path("log_creation", LogCreationView.as_view(), name="log_creation"),
 
 ]

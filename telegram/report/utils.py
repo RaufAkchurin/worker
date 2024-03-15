@@ -6,7 +6,7 @@ from aiogram.enums import ParseMode
 from magic_filter import F
 
 from telegram import keyboards
-from telegram.API import get_worker_by_telegram, post_shift_creation, get_report_individual
+from telegram.API import get_worker_by_telegram, post_shift_creation, get_report_individual, post_log_create
 from telegram.cleaner.cleaner import Cleaner
 from telegram.report.factory import DateCallbackFactory, ObjectCallbackFactory, CategoryCallbackFactory, \
     TypeCallbackFactory, PaginationCallbackFactory
@@ -17,9 +17,9 @@ from telegram.report.report_kb import ObjectInlineKeyboard, CategoryInlineKeyboa
 async def get_report_worker_individual(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     selected_object_id = data.get("selected_object_id")
-    worker_id = get_worker_by_telegram(message.from_user.id)
+    worker_id = get_worker_by_telegram(message.from_user.id)["worker"]["id"]
 
-    updated_report = await get_report_individual(object_id=int(selected_object_id), worker_id=worker_id["worker"]["id"])
+    updated_report = await get_report_individual(object_id=selected_object_id, worker_id=worker_id)
     if updated_report:
         from aiogram.types import FSInputFile
         excel_file = FSInputFile("/home/rauf/PycharmProjects/worker/report_worker.xlsx")
@@ -30,5 +30,11 @@ async def get_report_worker_individual(message: Message, state: FSMContext, bot:
     else:
         await bot.send_message(message.from_user.id,
                                text=f'Обратитесь к разработчику бота,'
-                                    f'\n Эксель файл не удалось получить с ендпоинта',
+                                    f'\n Эксель файл не удалось сгенерировать с помощью'
+                                    f'\n запроса на ендпоинт',
                                reply_markup=keyboards.main_kb)
+        await post_log_create(
+            func="def get_report_worker_individual",
+            description=f"selected_object_id = {selected_object_id} \n"
+                        f"worker_id = {worker_id}"
+        )

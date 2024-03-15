@@ -151,3 +151,17 @@ async def get_report_individual(object_id: int, worker_id: int):
         return True
     else:
         return False
+
+
+async def post_log_create(func: str, description: str):
+    url = f"{BASE_URL}/log_creation/"
+    data = {
+        "func": func,
+        "description": description,
+    }
+
+    response = requests.post(url, data)
+    if response.status_code == 201:
+        return True
+    else:
+        return False
