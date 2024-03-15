@@ -12,6 +12,7 @@ from telegram.report.factory import DateCallbackFactory, ObjectCallbackFactory, 
     TypeCallbackFactory, PaginationCallbackFactory
 from telegram.report.report_kb import ObjectInlineKeyboard, CategoryInlineKeyboard, TypeInlineKeyboard, \
     DateInlineKeyboard
+from telegram.report.utils import get_report_worker_individual
 
 router = Router()
 
@@ -191,17 +192,7 @@ async def report_add_more(message: Message, bot: Bot, state: FSMContext, cleaner
                                text=f'Спасибо большое, скоро вам придёт ексель файл'
                                     f'\nДля добавления нового отчёта нажмите в меню ОТПАРВИТЬ ОТЧЁТ',
                                reply_markup=keyboards.main_kb)
-
-        #  Excel report sending
-        worker_id = get_worker_by_telegram(message.from_user.id)
-        updated_report = get_report_individual(object_id=int(selected_object_id), worker_id=worker_id["worker"]["id"])
-        if updated_report:
-            from aiogram.types import FSInputFile
-            excel_file = FSInputFile("/home/rauf/PycharmProjects/worker/report_worker.xlsx")
-            await bot.send_document(
-                message.from_user.id,
-                document=excel_file,
-            )
+        await get_report_worker_individual(message, state, bot)
         await state.clear()
 
     [await cleaner.add(m.message_id) for m in messages]

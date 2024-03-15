@@ -144,7 +144,7 @@ async def post_shift_creation(worker_id, worker_tg, date, work_type_id, value, b
 
 # REPORT
 
-def get_report_individual(object_id: int, worker_id: int):
+async def get_report_individual(object_id: int, worker_id: int):
     url = f"{BASE_URL}/report_worker_individual/{object_id}/{worker_id}/"
     response = requests.get(url=url)
     if response.status_code == 200:
