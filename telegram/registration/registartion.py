@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
 
+from telegram import keyboards
 from telegram.API import get_worker_by_telegram, post_worker_registration
 
 
@@ -75,7 +76,8 @@ async def register_phone(message: Message, state: FSMContext, bot: Bot):
                                                           f'Имя: {regname} \n' \
                                                           f'Фамилия: {regsurname} \n' \
                                                           f'Телефон: {message.text} \n' \
-                                                          "Всё верно?(да/нет)")
+                                                          "Всё верно?",
+                               reply_markup=keyboards.yes_or_no_kb)
         await state.update_data(regtelephone=message.text)
         await state.set_state(RegisterState.confirmation)
     else:
